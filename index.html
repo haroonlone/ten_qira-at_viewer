@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="مقارنة القراءات العشر من مصاحف التيسير - تصفح ومقارنة بين الروايات المختلفة مع إمكانية التكبير والتصغير">
+    <meta name="keywords" content="القراءات العشر, مصاحف التيسير, القرآن, تجويد, مقارنة القراءات">
+    <meta name="author" content="مصاحف التيسير">
+    <title>القراءات العشر - مقارنة مصاحف التيسير</title>
+
+    <style>
+        /* === RESET & BASE STYLES === */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            font-family: 'Arial', 'Segoe UI', Tahoma, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        /* === HEADER SECTION === */
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2a4a7a 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: clamp(24px, 5vw, 40px);
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-bottom: 3px solid #2a4a7a; /* Changed from gold to darker blue */
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: inherit;
+        }
+
+        /* === CONTROLS SECTION === */
+        .controls {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        button, input, select {
+            padding: 8px 16px;
+            font-size: 15px;
+            border-radius: 8px;
+            border: 2px solid #1e3a5f;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        button {
+            background: #1e3a5f;
+            color: white;
+            font-weight: bold;
+            min-width: 80px;
+        }
+
+        button:hover {
+            background: #2a4a7a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 3px solid #2a4a7a; /* Changed from gold to dark blue */
+            outline-offset: 2px;
+        }
+
+        input {
+            width: 80px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        input:focus {
+            background: white;
+            border-color: #2a4a7a; /* Changed from gold to dark blue */
+        }
+
+        select {
+            width: 200px;
+            font-size: 16px;
+            background: #1e3a5f;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: left 10px center;
+            background-size: 20px;
+            padding-right: 16px;
+        }
+
+        select option {
+            background: white;
+            color: black;
+            padding: 8px;
+        }
+
+        select:hover {
+            background-color: #2a4a7a;
+        }
+
+        /* === GRID & CARDS SECTION === */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 25px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 18px;
+            background: #1e3a5f;
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .centerTitle {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 18px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 5px;
+        }
+
+        .navArrow {
+            cursor: pointer;
+            padding: 0 10px;
+            font-size: 24px;
+            transition: transform 0.2s ease;
+            user-select: none;
+        }
+
+        .navArrow:hover {
+            transform: scale(1.2);
+            color: #ffd700; /* Keeping gold hover effect as it's just text color, not border */
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.3s ease, border-color 0.3s ease;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .thumbnail:hover {
+            border-color: #1e3a5f; /* Changed from gold to dark blue */
+            opacity: 0.9;
+        }
+
+        .thumbnail.loading {
+            opacity: 0.5;
+        }
+
+        /* === ZOOM MODAL SECTION === */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.98);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        #zoomTitle {
+            color: white;
+            font-size: clamp(20px, 4vw, 30px);
+            font-weight: bold;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90%;
+            padding: 10px 20px;
+            background: rgba(30,58,95,0.8);
+            border-radius: 40px;
+            border: 2px solid #2a4a7a; /* Changed from gold to dark blue */
+        }
+
+        #zoomImage {
+            max-height: 85vh;
+            max-width: 95vw;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 3px solid white;
+            object-fit: contain;
+        }
+
+        .zoomBtn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 15px 25px;
+            font-size: 35px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            cursor: pointer;
+            border-radius: 50px;
+            z-index: 1010;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-weight: bold;
+            color: #1e3a5f;
+        }
+
+        .zoomBtn:hover {
+            background: #2a4a7a; /* Changed from gold to dark blue */
+            color: white; /* Added for better contrast */
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .zoomBtn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        #zoomPrev {
+            right: 30px;
+        }
+
+        #zoomNext {
+            left: 30px;
+        }
+
+        .close-hint {
+            position: absolute;
+            bottom: 30px;
+            color: rgba(255,255,255,0.7);
+            font-size: 16px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            pointer-events: none;
+        }
+
+        /* === LOADING STATES === */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            border-radius: 8px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e3a5f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* === ERROR MESSAGE === */
+        .error-message {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        /* === NOSCRIPT === */
+        .noscript-message {
+            text-align: center;
+            padding: 50px;
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeeba;
+            margin: 20px;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 768px) {
+            .controls {
+                padding: 10px;
+                gap: 8px;
+            }
+            
+            button, select {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .grid {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .zoomBtn {
+                padding: 10px 15px;
+                font-size: 25px;
+            }
+            
+            #zoomPrev {
+                right: 10px;
+            }
+            
+            #zoomNext {
+                left: 10px;
+            }
+            
+            .close-hint {
+                bottom: 15px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 16px;
+            }
+            
+            .centerTitle {
+                font-size: 16px;
+            }
+            
+            .navArrow {
+                font-size: 20px;
+                padding: 0 5px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+        }
+
+        /* === PRINT STYLES === */
+        @media print {
+            .controls, .navArrow, .modal, .zoomBtn {
+                display: none !important;
+            }
+            
+            .grid {
+                display: block;
+            }
+            
+            .card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>القراءات العشر - مقارنة مصاحف التيسير</h1>
+    </header>
+
+    <nav class="controls" role="toolbar" aria-label="أدوات التحكم في الصفحة">
+        <button onclick="prevPage()" aria-label="الصفحة السابقة" title="الصفحة السابقة">→ السابق</button>
+        <input type="number" id="pageInput" min="0" max="612" value="0" aria-label="رقم الصفحة" title="أدخل رقم الصفحة">
+        <button onclick="nextPage()" aria-label="الصفحة التالية" title="الصفحة التالية">التالي ←</button>
+
+        <select id="surahSelector" onchange="goToSurah()" aria-label="اختر السورة" title="اختر السورة للانتقال إليها">
+            <option value="">اختر السورة</option>
+        </select>
+
+        <select id="juzSelector" onchange="goToJuz()" aria-label="اختر الجزء" title="اختر الجزء للانتقال إليه">
+            <option value="">اختر الجزء</option>
+        </select>
+    </nav>
+
+    <main>
+        <div class="grid" id="pdfGrid"></div>
+    </main>
+
+    <div class="modal" id="zoomModal" onclick="outsideClick(event)" role="dialog" aria-modal="true" aria-label="عرض مكبر للصورة">
+        <div id="zoomTitle"></div>
+        <button class="zoomBtn" id="zoomPrev" aria-label="الصورة السابقة">→</button>
+        <img id="zoomImage" alt="صورة مكبرة للقراءة" onclick="event.stopPropagation()">
+        <button class="zoomBtn" id="zoomNext" aria-label="الصورة التالية">←</button>
+        <div class="close-hint">اضغط ESC للخروج</div>
+    </div>
+
+    <noscript>
+        <div class="noscript-message" role="alert">
+            يرجى تفعيل JavaScript لاستخدام هذه الصفحة بشكل كامل.
+        </div>
+    </noscript>
+
+    <script>
+        (function() {
+            "use strict";
+
+            // === CONFIGURATION ===
+            const CONFIG = {
+                basePath: ".",
+                maxPage: 612,
+                pageOffset: 4,
+                placeholderImage: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300' viewBox='0 0 200 300'%3E%3Crect width='200' height='300' fill='%23f0f0f0'/%3E%3Ctext x='50' y='150' font-family='Arial' font-size='14' fill='%23999'%3Eالصورة غير متوفرة%3C/text%3E%3C/svg%3E"
+            };
+
+            // === DATA ===
+            const pdfList = [
+                "حفص_عن_عاصم", "قالون_عن_نافع", "ورش_عن_نافع", "ابن_كثير_المكي",
+                "الدوري_عن_أبي_عمرو", "السوسي_عن_أبي_عمرو", "هشام_عن_ابن_عامر",
+                "ابن_ذكوان_عن_ابن_عامر", "شعبة_عن_عاصم", "خلف_عن_حمزة",
+                "خلاد_عن_حمزة", "الكسائي_الكوفي", "أبو_جعفر_المدني", "يعقوب_الحضرمي", "خلف_العاشر"
+            ];
+
+            const pdfTitles = [
+                "حفص عن عاصم", "قالون عن نافع", "ورش عن نافع", "ابن كثير المكي",
+                "الدوري عن أبي عمرو", "السوسي عن أبي عمرو", "هشام عن ابن عامر",
+                "ابن ذكوان عن ابن عامر", "شعبة عن عاصم", "خلف عن حمزة",
+                "خلاد عن حمزة", "الكسائي الكوفي", "أبو جعفر المدني", "يعقوب الحضرمي", "خلف العاشر"
+            ];
+
+            // سور القرآن مع أرقام الصفحات
+            const surahIndex = [
+                { name: "الفاتحة", page: 1 }, { name: "البقرة", page: 2 }, { name: "آل عمران", page: 50 },
+                { name: "النساء", page: 77 }, { name: "المائدة", page: 106 }, { name: "الأنعام", page: 128 },
+                { name: "الأعراف", page: 151 }, { name: "الأنفال", page: 177 }, { name: "التوبة", page: 187 },
+                { name: "يونس", page: 208 }, { name: "هود", page: 221 }, { name: "يوسف", page: 235 },
+                { name: "الرعد", page: 249 }, { name: "ابراهيم", page: 255 }, { name: "الحجر", page: 262 },
+                { name: "النحل", page: 267 }, { name: "الإسراء", page: 282 }, { name: "الكهف", page: 293 },
+                { name: "مريم", page: 305 }, { name: "طه", page: 312 }, { name: "الأنبياء", page: 322 },
+                { name: "الحج", page: 332 }, { name: "المؤمنون", page: 342 }, { name: "النور", page: 350 },
+                { name: "الفرقان", page: 359 }, { name: "الشعراء", page: 367 }, { name: "النمل", page: 377 },
+                { name: "القصص", page: 385 }, { name: "العنكبوت", page: 396 }, { name: "الروم", page: 404 },
+                { name: "لقمان", page: 411 }, { name: "السجدة", page: 415 }, { name: "الأحزاب", page: 418 },
+                { name: "سبأ", page: 428 }, { name: "فاطر", page: 434 }, { name: "يس", page: 440 },
+                { name: "الصافات", page: 446 }, { name: "ص", page: 453 }, { name: "الزمر", page: 458 },
+                { name: "غافر", page: 467 }, { name: "فصلت", page: 477 }, { name: "الشورى", page: 483 },
+                { name: "الزخرف", page: 489 }, { name: "الدخان", page: 496 }, { name: "الجاثية", page: 499 },
+                { name: "الأحقاف", page: 502 }, { name: "محمد", page: 507 }, { name: "الفتح", page: 511 },
+                { name: "الحجرات", page: 515 }, { name: "ق", page: 518 }, { name: "الذاريات", page: 520 },
+                { name: "الطور", page: 523 }, { name: "النجم", page: 526 }, { name: "القمر", page: 528 },
+                { name: "الرحمن", page: 531 }, { name: "الواقعة", page: 534 }, { name: "الحديد", page: 537 },
+                { name: "المجادلة", page: 542 }, { name: "الحشر", page: 545 }, { name: "الممتحنة", page: 549 },
+                { name: "الصف", page: 551 }, { name: "الجمعة", page: 553 }, { name: "المنافقون", page: 554 },
+                { name: "التغابن", page: 556 }, { name: "الطلاق", page: 558 }, { name: "التحريم", page: 560 },
+                { name: "الملك", page: 562 }, { name: "القلم", page: 564 }, { name: "الحاقة", page: 566 },
+                { name: "المعارج", page: 568 }, { name: "نوح", page: 570 }, { name: "الجن", page: 572 },
+                { name: "المزمل", page: 574 }, { name: "المدثر", page: 575 }, { name: "القيامة", page: 577 },
+                { name: "الإنسان", page: 578 }, { name: "المرسلات", page: 580 }, { name: "النبأ", page: 582 },
+                { name: "النازعات", page: 583 }, { name: "عبس", page: 585 }, { name: "التكوير", page: 586 },
+                { name: "الانفطار", page: 587 }, { name: "المطففين", page: 587 }, { name: "الانشقاق", page: 589 },
+                { name: "البروج", page: 590 }, { name: "الطارق", page: 591 }, { name: "الأعلى", page: 591 },
+                { name: "الغاشية", page: 592 }, { name: "الفجر", page: 593 }, { name: "البلد", page: 594 },
+                { name: "الشمس", page: 595 }, { name: "الليل", page: 595 }, { name: "الضحى", page: 596 },
+                { name: "الشرح", page: 596 }, { name: "التين", page: 597 }, { name: "العلق", page: 597 },
+                { name: "القدر", page: 598 }, { name: "البينة", page: 598 }, { name: "الزلزلة", page: 599 },
+                { name: "العاديات", page: 599 }, { name: "القارعة", page: 600 }, { name: "التكاثر", page: 600 },
+                { name: "العصر", page: 601 }, { name: "الهمزة", page: 601 }, { name: "الفيل", page: 601 },
+                { name: "قريش", page: 602 }, { name: "الماعون", page: 602 }, { name: "الكوثر", page: 602 },
+                { name: "الكافرون", page: 603 }, { name: "النصر", page: 603 }, { name: "المسد", page: 603 },
+                { name: "الإخلاص", page: 604 }, { name: "الفلق", page: 604 }, { name: "الناس", page: 604 }
+            ];
+
+            // أجزاء القرآن (صفحات بداية كل جزء)
+            const juzIndex = [
+                1, 22, 42, 62, 82, 102, 121, 142, 162, 182,
+                201, 222, 242, 262, 282, 302, 322, 342, 362, 382,
+                402, 422, 442, 462, 482, 502, 522, 542, 562, 582
+            ];
+
+            // === STATE ===
+            let currentPage = 0;
+            let zoomFolder = "";
+            let zoomPage = 0;
+            let isLoading = false;
+
+            // === DOM ELEMENTS ===
+            const surahSelector = document.getElementById("surahSelector");
+            const juzSelector = document.getElementById("juzSelector");
+            const pageInput = document.getElementById("pageInput");
+            const grid = document.getElementById("pdfGrid");
+            const zoomModal = document.getElementById("zoomModal");
+            const zoomImage = document.getElementById("zoomImage");
+            const zoomTitle = document.getElementById("zoomTitle");
+            const zoomPrev = document.getElementById("zoomPrev");
+            const zoomNext = document.getElementById("zoomNext");
+
+            // === INITIALIZATION FUNCTIONS ===
+            function initializeSelectors() {
+                // Populate surah selector
+                surahIndex.forEach(s => {
+                    const opt = document.createElement("option");
+                    opt.value = s.page;
+                    opt.textContent = s.name;
+                    surahSelector.appendChild(opt);
+                });
+
+                // Populate juz selector
+                juzIndex.forEach((p, i) => {
+                    const opt = document.createElement("option");
+                    opt.value = p;
+                    opt.textContent = "الجزء " + (i + 1);
+                    juzSelector.appendChild(opt);
+                });
+            }
+
+            // === UTILITY FUNCTIONS ===
+            function getImageNumber(displayPage) {
+                return displayPage === 0 ? 1 : displayPage + CONFIG.pageOffset;
+            }
+
+            function showLoading(element) {
+                if (!element) return;
+                isLoading = true;
+                element.classList.add('loading');
+            }
+
+            function hideLoading(element) {
+                if (!element) return;
+                isLoading = false;
+                element.classList.remove('loading');
+            }
+
+            function handleImageError(img, title) {
+                img.src = CONFIG.placeholderImage;
+                img.alt = `الصورة غير متوفرة - ${title}`;
+                console.warn(`Failed to load image for ${title}`);
+            }
+
+            // === CORE RENDERING ===
+            function renderPage() {
+                if (isLoading) return;
+                
+                pageInput.value = currentPage;
+                grid.innerHTML = "";
+
+                pdfList.forEach((folder, i) => {
+                    const folderEnc = encodeURIComponent(folder);
+                    const imgNumber = getImageNumber(currentPage);
+                    const imgPath = `${CONFIG.basePath}/${folderEnc}/page${String(imgNumber).padStart(3, '0')}.png`;
+
+                    // Create card elements
+                    const card = document.createElement("div");
+                    card.className = "card";
+
+                    // Title section with navigation
+                    const title = document.createElement("div");
+                    title.className = "title";
+
+                    const prev = document.createElement("span");
+                    prev.className = "navArrow";
+                    prev.innerHTML = "→";
+                    prev.setAttribute("aria-label", "الصفحة السابقة");
+                    prev.onclick = (e) => {
+                        e.stopPropagation();
+                        prevPage();
+                    };
+
+                    const center = document.createElement("span");
+                    center.className = "centerTitle";
+                    center.textContent = pdfTitles[i];
+
+                    const next = document.createElement("span");
+                    next.className = "navArrow";
+                    next.innerHTML = "←";
+                    next.setAttribute("aria-label", "الصفحة التالية");
+                    next.onclick = (e) => {
+                        e.stopPropagation();
+                        nextPage();
+                    };
+
+                    title.appendChild(prev);
+                    title.appendChild(center);
+                    title.appendChild(next);
+
+                    // Image element
+                    const img = document.createElement("img");
+                    img.className = "thumbnail";
+                    img.loading = "lazy";
+                    img.src = imgPath;
+                    img.alt = `${pdfTitles[i]} - صفحة ${imgNumber}`;
+                    
+                    // Image event handlers
+                    img.onclick = () => openZoom(imgPath, folder, imgNumber, pdfTitles[i]);
+                    img.onerror = function() {
+                        handleImageError(this, pdfTitles[i]);
+                    };
+                    img.onload = function() {
+                        this.classList.remove('loading');
+                    };
+
+                    // Assemble card
+                    card.appendChild(title);
+                    card.appendChild(img);
+                    grid.appendChild(card);
+                });
+            }
+
+            // === NAVIGATION FUNCTIONS ===
+            function nextPage() {
+                if (currentPage < CONFIG.maxPage) {
+                    currentPage++;
+                    renderPage();
+                }
+            }
+
+            function prevPage() {
+                if (currentPage > 0) {
+                    currentPage--;
+                    renderPage();
+                }
+            }
+
+            function jumpPage() {
+                const p = parseInt(pageInput.value);
+                if (!isNaN(p) && p >= 0 && p <= CONFIG.maxPage) {
+                    currentPage = p;
+                    renderPage();
+                } else {
+                    alert(`الرجاء إدخال رقم صفحة صحيح (0-${CONFIG.maxPage})`);
+                    pageInput.value = currentPage;
+                }
+            }
+
+            function goToSurah() {
+                const p = parseInt(surahSelector.value);
+                if (!isNaN(p)) {
+                    currentPage = p;
+                    renderPage();
+                }
+            }
+
+            function goToJuz() {
+                const p = parseInt(juzSelector.value);
+                if (!isNaN(p)) {
+                    currentPage = p;
+                    renderPage();
+                }
+            }
+
+            // === ZOOM FUNCTIONS ===
+            function openZoom(src, folder, page, titleText) {
+                zoomFolder = folder;
+                zoomPage = page;
+                zoomImage.src = src;
+                zoomTitle.textContent = titleText;
+                zoomModal.style.display = "flex";
+                document.body.style.overflow = "hidden"; // Prevent background scrolling
+                
+                // Preload adjacent images
+                preloadAdjacentImages(folder, page);
+            }
+
+            function closeModal() {
+                zoomModal.style.display = "none";
+                document.body.style.overflow = ""; // Restore scrolling
+            }
+
+            function outsideClick(e) {
+                if (e.target.id === "zoomModal") {
+                    closeModal();
+                }
+            }
+
+            function preloadAdjacentImages(folder, page) {
+                const folderEnc = encodeURIComponent(folder);
+                
+                // Preload next image
+                if (page < CONFIG.maxPage + CONFIG.pageOffset) {
+                    const nextImg = new Image();
+                    nextImg.src = `${CONFIG.basePath}/${folderEnc}/page${String(page + 1).padStart(3, '0')}.png`;
+                }
+                
+                // Preload previous image
+                if (page > 1) {
+                    const prevImg = new Image();
+                    prevImg.src = `${CONFIG.basePath}/${folderEnc}/page${String(page - 1).padStart(3, '0')}.png`;
+                }
+            }
+
+            function updateZoomImage() {
+                if (!zoomFolder) return;
+                
+                const folderEnc = encodeURIComponent(zoomFolder);
+                const newSrc = `${CONFIG.basePath}/${folderEnc}/page${String(zoomPage).padStart(3, '0')}.png`;
+                
+                zoomImage.src = newSrc;
+                
+                // Update main page to match
+                currentPage = zoomPage <= 5 ? 0 : zoomPage - CONFIG.pageOffset;
+                renderPage();
+                
+                // Preload next set of images
+                preloadAdjacentImages(zoomFolder, zoomPage);
+            }
+
+            // === KEYBOARD NAVIGATION ===
+            function handleKeyDown(e) {
+                // Zoom modal keyboard controls
+                if (zoomModal.style.display === "flex") {
+                    switch(e.key) {
+                        case "ArrowLeft":
+                            e.preventDefault();
+                            zoomPage++;
+                            updateZoomImage();
+                            break;
+                        case "ArrowRight":
+                            e.preventDefault();
+                            if (zoomPage > 1) {
+                                zoomPage--;
+                                updateZoomImage();
+                            }
+                            break;
+                        case "Escape":
+                            e.preventDefault();
+                            closeModal();
+                            break;
+                    }
+                } else {
+                    // Main page keyboard controls
+                    switch(e.key) {
+                        case "ArrowLeft":
+                            e.preventDefault();
+                            nextPage(); // RTL: left arrow goes to next page
+                            break;
+                        case "ArrowRight":
+                            e.preventDefault();
+                            prevPage(); // RTL: right arrow goes to previous page
+                            break;
+                        case "Home":
+                            e.preventDefault();
+                            currentPage = 0;
+                            renderPage();
+                            break;
+                        case "End":
+                            e.preventDefault();
+                            currentPage = CONFIG.maxPage;
+                            renderPage();
+                            break;
+                        case "PageUp":
+                            e.preventDefault();
+                            currentPage = Math.max(0, currentPage - 10);
+                            renderPage();
+                            break;
+                        case "PageDown":
+                            e.preventDefault();
+                            currentPage = Math.min(CONFIG.maxPage, currentPage + 10);
+                            renderPage();
+                            break;
+                    }
+                }
+            }
+
+            // === EVENT LISTENERS ===
+            function setupEventListeners() {
+                // Page input
+                pageInput.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        jumpPage();
+                    }
+                });
+
+                pageInput.addEventListener("blur", jumpPage);
+
+                // Zoom buttons
+                zoomPrev.onclick = () => {
+                    zoomPage++;
+                    updateZoomImage();
+                };
+
+                zoomNext.onclick = () => {
+                    if (zoomPage > 1) {
+                        zoomPage--;
+                        updateZoomImage();
+                    }
+                };
+
+                // Global keyboard
+                document.addEventListener("keydown", handleKeyDown);
+
+                // Prevent accidental zoom modal close when clicking image
+                zoomImage.addEventListener("click", (e) => e.stopPropagation());
+
+                // Handle window resize
+                window.addEventListener("resize", () => {
+                    // No action needed, but good to have for future responsive features
+                });
+
+                // Touch events for mobile
+                let touchStartX = 0;
+                let touchEndX = 0;
+                
+                zoomModal.addEventListener("touchstart", (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+                
+                zoomModal.addEventListener("touchend", (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                }, { passive: true });
+                
+                function handleSwipe() {
+                    const swipeThreshold = 50;
+                    const diff = touchStartX - touchEndX;
+                    
+                    if (Math.abs(diff) > swipeThreshold) {
+                        if (diff > 0) {
+                            // Swipe left
+                            zoomPage++;
+                            updateZoomImage();
+                        } else {
+                            // Swipe right
+                            if (zoomPage > 1) {
+                                zoomPage--;
+                                updateZoomImage();
+                            }
+                        }
+                    }
+                }
+            }
+
+            // === INITIALIZE APPLICATION ===
+            function init() {
+                initializeSelectors();
+                setupEventListeners();
+                renderPage();
+                
+                // Log for debugging
+                console.log("تطبيق القراءات العشر جاهز للاستخدام");
+            }
+
+            // Start the application when DOM is ready
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", init);
+            } else {
+                init();
+            }
+
+            // Export functions to global scope for inline event handlers
+            window.prevPage = prevPage;
+            window.nextPage = nextPage;
+            window.goToSurah = goToSurah;
+            window.goToJuz = goToJuz;
+            window.openZoom = openZoom;
+            window.outsideClick = outsideClick;
+        })();
+    </script>
+</body>
+</html>
