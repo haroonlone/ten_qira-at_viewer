@@ -210,31 +210,43 @@
         }
 
         /* === ZOOM MODAL SECTION === */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.98);
-            justify-content: center;
+         #zoomTitleContainer {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            flex-direction: column;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
+            width: 95%;
+            max-width: 1200px;
+            margin-bottom: 15px;
+            gap: 10px;
         }
 
         #zoomTitle {
+            flex-grow: 1;
+            text-align: center;
+            background: #1e3a5f; /* same as card title */
             color: white;
-            font-size: clamp(20px, 4vw, 30px);
+            font-size: 18px;      /* same as card */
             font-weight: bold;
-            margin-bottom: 20px;
+            padding: 8px;
+            border-radius: 8px;   /* same as card title */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 90%;
-            padding: 10px 20px;
-            background: rgba(30,58,95,0.8);
-            border-radius: 40px;
-            border: 2px solid #2a4a7a; /* Changed from gold to dark blue */
+        }
+
+        .navArrow {
+            cursor: pointer;
+            padding: 0 10px;
+            font-size: 24px;
+            font-weight: bold;
+            user-select: none;
+            color: white;           /* default white */
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .navArrow:hover {
+            transform: scale(1.2);
+            color: #ffd700; /* gold hover, same as main cards */
         }
 
         #zoomImage {
@@ -246,39 +258,17 @@
             object-fit: contain;
         }
 
-        .zoomBtn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 15px 25px;
-            font-size: 35px;
-            background: rgba(255,255,255,0.9);
-            border: none;
-            cursor: pointer;
-            border-radius: 50px;
-            z-index: 1010;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            font-weight: bold;
-            color: #1e3a5f;
-        }
-
-        .zoomBtn:hover {
-            background: #2a4a7a; /* Changed from gold to dark blue */
-            color: white; /* Added for better contrast */
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .zoomBtn:active {
-            transform: translateY(-50%) scale(0.95);
-        }
-
-        #zoomPrev {
-            right: 30px;
-        }
-
-        #zoomNext {
-            left: 30px;
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.98);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            padding: 15px;
         }
 
         .close-hint {
@@ -291,7 +281,6 @@
             border-radius: 20px;
             pointer-events: none;
         }
-
         /* === LOADING STATES === */
         .loading-overlay {
             position: absolute;
@@ -346,47 +335,30 @@
 
         /* === RESPONSIVE DESIGN === */
         /* === MOBILE RESPONSIVE ENHANCEMENTS === */
-        @media (max-width: 768px) {
-            /* Arrow buttons in controls */
-            .controls button {
-                padding: 6px 10px;       /* Smaller padding */
-                font-size: 14px;         /* Smaller font */
-                min-width: 50px;         /* Not too wide */
+         @media (max-width: 768px) {
+            #zoomTitle {
+                font-size: 16px;
+                padding: 6px;
             }
-
-            /* Page input */
-            .controls input {
-                width: 60px;             /* narrower input */
-                padding: 6px 8px;
-                font-size: 14px;
+            .navArrow {
+                font-size: 22px;
+                padding: 0 8px;
             }
-
-            /* Select dropdowns */
-            .controls select {
-                width: 150px;            /* narrower dropdown */
-                font-size: 14px;
-                padding-right: 12px;
+            #zoomTitleContainer {
+                flex-wrap: wrap;
             }
         }
-
         @media (max-width: 480px) {
-            /* Even smaller for small mobiles */
-            .controls button {
-                padding: 5px 8px;
-                font-size: 12px;
-                min-width: 40px;
+            #zoomTitle {
+                font-size: 14px;
+                padding: 4px;
             }
-
-            .controls input {
-                width: 50px;
-                font-size: 12px;
-            }
-
-            .controls select {
-                width: 120px;
-                font-size: 12px;
+            .navArrow {
+                font-size: 20px;
+                padding: 0 6px;
             }
         }
+
 
         /* === PRINT STYLES === */
         @media print {
@@ -430,10 +402,12 @@
     </main>
 
     <div class="modal" id="zoomModal" onclick="outsideClick(event)" role="dialog" aria-modal="true" aria-label="عرض مكبر للصورة">
-        <div id="zoomTitle"></div>
-        <button class="zoomBtn" id="zoomPrev" aria-label="الصورة السابقة">→</button>
+        <div id="zoomTitleContainer">
+            <span class="navArrow" id="zoomPrev" aria-label="الصورة السابقة">→</span>
+            <div id="zoomTitle" class="centerTitle">عنوان الصورة</div>
+            <span class="navArrow" id="zoomNext" aria-label="الصورة التالية">←</span>
+        </div>
         <img id="zoomImage" alt="صورة مكبرة للقراءة" onclick="event.stopPropagation()">
-        <button class="zoomBtn" id="zoomNext" aria-label="الصورة التالية">←</button>
         <div class="close-hint">اضغط ESC للخروج</div>
     </div>
 
