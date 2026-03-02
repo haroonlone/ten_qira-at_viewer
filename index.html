@@ -828,16 +828,17 @@
 
                 // Zoom buttons
                 zoomPrev.onclick = () => {
-                    zoomPage++;
-                    updateZoomImage();
-                };
-
-                zoomNext.onclick = () => {
                     if (zoomPage > 1) {
                         zoomPage--;
                         updateZoomImage();
                     }
                 };
+
+                zoomNext.onclick = () => {
+                    zoomPage++;
+                    updateZoomImage(); 
+                };
+
 
                 // Global keyboard
                 document.addEventListener("keydown", handleKeyDown);
