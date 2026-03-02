@@ -746,10 +746,14 @@
             function updateZoomImage() {
                 if (!zoomFolder) return;
 
-                // 🔥 Skip pages 002–004 when moving forward from page001
+                // 🔥 Forward Skip (001 → 005)
                 if (zoomPage === 2) {
                     zoomPage = CONFIG.pageOffset + 1; 
-                    // Example: if offset = 4 → 4+1 = 5
+                }
+
+                // 🔥 Backward Skip (005 → 001)
+                if (zoomPage > 1 && zoomPage <= CONFIG.pageOffset) {
+                    zoomPage = 1;
                 }
 
                 const folderEnc = encodeURIComponent(zoomFolder);
@@ -757,7 +761,7 @@
 
                 zoomImage.src = newSrc;
 
-                // 🔄 Synchronize with main display page
+                // 🔄 Synchronize logical page
                 if (zoomPage === 1) {
                     currentPage = 0;
                 } else {
