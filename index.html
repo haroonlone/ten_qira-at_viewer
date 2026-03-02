@@ -567,6 +567,50 @@
                 });
             }
 
+            function updateSelectors() {
+
+                // 🔹 If page 0 → show "اختر..."
+                if (currentPage === 0) {
+                    surahSelector.value = "";
+                    juzSelector.value = "";
+                    return;
+                }
+
+                // ===== SURAH AUTO-DETECT =====
+                let selectedSurah = "";
+
+                for (let i = 0; i < surahIndex.length; i++) {
+                    const start = surahIndex[i].page;
+                    const next = i < surahIndex.length - 1
+                        ? surahIndex[i + 1].page
+                        : CONFIG.maxPage + 1;
+
+                    if (currentPage >= start && currentPage < next) {
+                        selectedSurah = start;
+                        break;
+                    }
+                }
+
+                surahSelector.value = selectedSurah;
+
+                // ===== JUZ AUTO-DETECT =====
+                let selectedJuz = "";
+
+                for (let i = 0; i < juzIndex.length; i++) {
+                    const start = juzIndex[i];
+                    const next = i < juzIndex.length - 1
+                        ? juzIndex[i + 1]
+                        : CONFIG.maxPage + 1;
+
+                    if (currentPage >= start && currentPage < next) {
+                        selectedJuz = start;
+                        break;
+                    }
+                }
+
+                juzSelector.value = selectedJuz;
+            }
+
             // === UTILITY FUNCTIONS ===
             function getImageNumber(displayPage) {
                 return displayPage === 0 ? 1 : displayPage + CONFIG.pageOffset;
@@ -595,6 +639,7 @@
                 if (isLoading) return;
                 
                 pageInput.value = currentPage;
+                updateSelectors();  
                 grid.innerHTML = "";
 
                 pdfList.forEach((folder, i) => {
