@@ -345,58 +345,46 @@
         }
 
         /* === RESPONSIVE DESIGN === */
+        /* === MOBILE RESPONSIVE ENHANCEMENTS === */
         @media (max-width: 768px) {
-            .controls {
-                padding: 10px;
-                gap: 8px;
+            /* Arrow buttons in controls */
+            .controls button {
+                padding: 6px 10px;       /* Smaller padding */
+                font-size: 14px;         /* Smaller font */
+                min-width: 50px;         /* Not too wide */
             }
-            
-            button, select {
-                width: 100%;
-                max-width: 300px;
+
+            /* Page input */
+            .controls input {
+                width: 60px;             /* narrower input */
+                padding: 6px 8px;
+                font-size: 14px;
             }
-            
-            .grid {
-                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-                padding: 15px;
-                gap: 15px;
-            }
-            
-            .zoomBtn {
-                padding: 10px 15px;
-                font-size: 25px;
-            }
-            
-            #zoomPrev {
-                right: 10px;
-            }
-            
-            #zoomNext {
-                left: 10px;
-            }
-            
-            .close-hint {
-                bottom: 15px;
-                font-size: 12px;
+
+            /* Select dropdowns */
+            .controls select {
+                width: 150px;            /* narrower dropdown */
+                font-size: 14px;
+                padding-right: 12px;
             }
         }
 
         @media (max-width: 480px) {
-            .title {
-                font-size: 16px;
+            /* Even smaller for small mobiles */
+            .controls button {
+                padding: 5px 8px;
+                font-size: 12px;
+                min-width: 40px;
             }
-            
-            .centerTitle {
-                font-size: 16px;
+
+            .controls input {
+                width: 50px;
+                font-size: 12px;
             }
-            
-            .navArrow {
-                font-size: 20px;
-                padding: 0 5px;
-            }
-            
-            .header {
-                padding: 15px;
+
+            .controls select {
+                width: 120px;
+                font-size: 12px;
             }
         }
 
