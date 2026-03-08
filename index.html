@@ -607,7 +607,7 @@
                 pdfList.forEach((folder, i) => {
                     const folderEnc = encodeURIComponent(folder);
                     const imgNumber = getImageNumber(currentPage);
-                    const imgPath = `${CONFIG.basePath}/${folderEnc}/page${String(imgNumber).padStart(3, '0')}.png`;
+                    const imgPath = `${CONFIG.basePath}/${folderEnc}/page${String(imgNumber).padStart(3, '0')}.jpg`;
 
                     // Create card elements
                     const card = document.createElement("div");
@@ -740,13 +740,13 @@
                 // Preload next image
                 if (page < CONFIG.maxPage + CONFIG.pageOffset) {
                     const nextImg = new Image();
-                    nextImg.src = `${CONFIG.basePath}/${folderEnc}/page${String(page + 1).padStart(3, '0')}.png`;
+                    nextImg.src = `${CONFIG.basePath}/${folderEnc}/page${String(page + 1).padStart(3, '0')}.jpg`;
                 }
                 
                 // Preload previous image
                 if (page > 1) {
                     const prevImg = new Image();
-                    prevImg.src = `${CONFIG.basePath}/${folderEnc}/page${String(page - 1).padStart(3, '0')}.png`;
+                    prevImg.src = `${CONFIG.basePath}/${folderEnc}/page${String(page - 1).padStart(3, '0')}.jpg`;
                 }
             }
 
@@ -764,7 +764,7 @@
                 }
 
                 const folderEnc = encodeURIComponent(zoomFolder);
-                const newSrc = `${CONFIG.basePath}/${folderEnc}/page${String(zoomPage).padStart(3, '0')}.png`;
+                const newSrc = `${CONFIG.basePath}/${folderEnc}/page${String(zoomPage).padStart(3, '0')}.jpg`;
 
                 zoomImage.src = newSrc;
 
