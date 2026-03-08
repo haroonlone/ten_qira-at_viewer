@@ -890,15 +890,14 @@
                     
                     if (Math.abs(diff) > swipeThreshold) {
                         if (diff > 0) {
-                            // Swipe left
-                            zoomPage++;
-                            updateZoomImage();
-                        } else {
-                            // Swipe right
+                            // Swipe left (finger moves from right to left) → Go to previous page (opposite of right arrow)
                             if (zoomPage > 1) {
                                 zoomPage--;
                                 updateZoomImage();
-                            }
+                        } else {
+                            // Swipe right (finger moves from left to right) → Go to next page (opposite of left arrow)
+                            zoomPage++;
+                            updateZoomImage();                            }
                         }
                     }
                 }
