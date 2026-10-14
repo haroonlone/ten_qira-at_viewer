@@ -164,7 +164,7 @@ if(hp>=0&&hp<=MAX)page=hp;
 
 const imgNum=p=>p===0?1:p+OFF;
 const src=(i,p)=>`${BASE}/${encodeURIComponent(R[i][1])}/page${String(imgNum(p)).padStart(3,"0")}.jpg`;
-const effCols=()=>{const n=list().length||1;const maxFit=Math.max(1,Math.floor(innerWidth/(innerWidth<600?150:230)));
+const effCols=()=>{const n=list().length||1;const maxFit=Math.max(1,Math.floor((innerWidth-40)/(innerWidth<600?150:290)));
   return Math.max(1,Math.min(cols||n,n,maxFit>0?maxFit:1))};
 
 function init(){
@@ -260,10 +260,7 @@ function render(){
   $("pageNote").value=pnotes[page]||"";
   history.replaceState(null,"","#p="+page);
   const g=$("grid");g.innerHTML="";
-  const L=list(),pg=page;
-  let pend=L.length;
-  const done=()=>{if(--pend===0&&pg===page&&!(navigator.connection&&navigator.connection.saveData))
-    (window.requestIdleCallback||setTimeout)(()=>{if(pg===page)preload(pg+1)})};
+  const L=list();
   if(!L.length){g.innerHTML='<div class="empty">لم تختر أي قراءة. افتح «اختيار القراءات» وحدد قراءة أو أكثر.</div>';return}
   L.forEach((ri,idx)=>{
     const card=document.createElement("div");card.className="card"+(refOn&&idx===0?" ref":"");
@@ -277,9 +274,8 @@ function render(){
     const img=document.createElement("img");img.className="thumb loading";img.loading="lazy";img.draggable=false;
     img.src=src(ri,page);img.alt=`${R[ri][0]} - صفحة ${page}`;
     img.decoding="async";
-    const fin=()=>{if(!img._d){img._d=1;done()}};
-    img.onload=()=>{img.classList.remove("loading");fin()};
-    img.onerror=()=>{fin();img.classList.remove("loading");img.classList.add("err");
+    img.onload=()=>img.classList.remove("loading");
+    img.onerror=()=>{img.classList.remove("loading");img.classList.add("err");
       img.src="data:image/svg+xml,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='300' height='400'><rect width='300' height='400' fill='#e6e8ec'/><text x='150' y='200' font-family='Arial' font-size='18' fill='#888' text-anchor='middle'>الصورة غير متوفرة</text></svg>")};
     img.onclick=()=>{if(!ann)openZ(idx)};
     box.appendChild(img);
@@ -333,7 +329,7 @@ function attach(box,getRi){
     addEventListener("pointermove",mv);addEventListener("pointerup",up);addEventListener("pointercancel",up);
   });
 }
-function preload(p){if(p>MAX)return;list().forEach(i=>{const m=new Image();m.src=src(i,p)})}
+function preloadZ(ri){[page+1,page-1].forEach(q=>{if(q>=0&&q<=MAX){const m=new Image();m.src=src(ri,q)}})}
 
 /* ---- zoom ---- */
 const open=()=>$("zoomModal").style.display==="flex";
@@ -342,7 +338,7 @@ function closeZ(){$("zoomModal").style.display="none";document.body.style.overfl
 function showZ(){
   const ri=list()[zi];if(ri==null)return closeZ();
   $("zoomImage").src=src(ri,page);$("zoomImage").alt=R[ri][0];
-  $("zoomTitle").textContent=`${R[ri][0]} — صفحة ${page}`;
+  $("zoomTitle").textContent=`${R[ri][0]} — صفحة ${page}`;preloadZ(ri);
   zoomBy(0);paint($("zbox"),ri);
 }
 function zoomBy(d){zz=Math.max(.5,Math.min(3,zz+d));
