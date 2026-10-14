@@ -1,933 +1,370 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="مقارنة القراءات العشر من مصاحف التيسير - تصفح ومقارنة بين الروايات المختلفة مع إمكانية التكبير والتصغير">
-    <meta name="keywords" content="القراءات العشر, مصاحف التيسير, القرآن, تجويد, مقارنة القراءات">
-    <meta name="author" content="هارون رشيد لون">
-    <title>المقارنة التفاعلية لمصاحف القراءات العشر</title>
-
-    <style>
-        /* === RESET & BASE STYLES === */
-        * {
-            box-sizing: border-box;
-        }
-        
-        body {
-            margin: 0;
-            font-family: 'Arial', 'Segoe UI', Tahoma, sans-serif;
-            background: #f5f5f5;
-            line-height: 1.6;
-        }
-
-        /* === HEADER SECTION === */
-        .header {
-            background: linear-gradient(135deg, #1e3a5f 0%, #2a4a7a 100%);
-            color: white;
-            text-align: center;
-            padding: 20px;
-            font-size: clamp(24px, 5vw, 40px);
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-bottom: 3px solid #2a4a7a; /* Changed from gold to darker blue */
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: inherit;
-        }
-
-        /* === CONTROLS SECTION === */
-        .controls {
-            text-align: center;
-            padding: 15px;
-            background: white;
-            border-bottom: 1px solid #ddd;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        button, input, select {
-            padding: 8px 16px;
-            font-size: 15px;
-            border-radius: 8px;
-            border: 2px solid #1e3a5f;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        button {
-            background: #1e3a5f;
-            color: white;
-            font-weight: bold;
-            min-width: 80px;
-        }
-
-        button:hover {
-            background: #2a4a7a;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:focus-visible, input:focus-visible, select:focus-visible {
-            outline: 3px solid #2a4a7a; /* Changed from gold to dark blue */
-            outline-offset: 2px;
-        }
-
-        input {
-            width: 80px;
-            text-align: center;
-            background: #f8f9fa;
-        }
-
-        input:focus {
-            background: white;
-            border-color: #2a4a7a; /* Changed from gold to dark blue */
-        }
-
-        select {
-            width: 200px;
-            font-size: 16px;
-            background: #1e3a5f;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: left 10px center;
-            background-size: 20px;
-            padding-right: 16px;
-        }
-
-        select option {
-            background: white;
-            color: black;
-            padding: 8px;
-        }
-
-        select:hover {
-            background-color: #2a4a7a;
-        }
-
-        /* === GRID & CARDS SECTION === */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 25px;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: white;
-            padding: 8px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-
-        .title {
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 18px;
-            background: #1e3a5f;
-            color: white;
-            padding: 8px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .centerTitle {
-            flex-grow: 1;
-            text-align: center;
-            font-size: 18px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding: 0 5px;
-        }
-
-        .navArrow {
-            cursor: pointer;
-            padding: 0 10px;
-            font-size: 24px;
-            transition: transform 0.2s ease;
-            user-select: none;
-        }
-
-        .navArrow:hover {
-            transform: scale(1.2);
-            color: #ffd700; /* Keeping gold hover effect as it's just text color, not border */
-        }
-
-        .thumbnail {
-            width: 100%;
-            height: auto;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: opacity 0.3s ease, border-color 0.3s ease;
-            aspect-ratio: 3/4;
-            object-fit: cover;
-            background: #f0f0f0;
-        }
-
-        .thumbnail:hover {
-            border-color: #1e3a5f; /* Changed from gold to dark blue */
-            opacity: 0.9;
-        }
-
-        .thumbnail.loading {
-            opacity: 0.5;
-        }
-
-        /* === ZOOM MODAL SECTION === */
-         #zoomTitleContainer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 95%;
-            max-width: 1200px;
-            margin-bottom: 15px;
-            gap: 10px;
-        }
-
-        #zoomTitle {
-            flex-grow: 1;
-            text-align: center;
-            background: #1e3a5f; /* same as card title */
-            color: white;
-            font-size: 18px;      /* same as card */
-            font-weight: bold;
-            padding: 8px;
-            border-radius: 8px;   /* same as card title */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .navArrow {
-            cursor: pointer;
-            padding: 0 10px;
-            font-size: 24px;
-            font-weight: bold;
-            user-select: none;
-            color: white;           /* default white */
-            transition: transform 0.2s ease, color 0.2s ease;
-        }
-
-        .navArrow:hover {
-            transform: scale(1.2);
-            color: #ffd700; /* gold hover, same as main cards */
-        }
-
-        #zoomImage {
-            max-height: 85vh;
-            max-width: 95vw;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 3px solid white;
-            object-fit: contain;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.98);
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-            padding: 15px;
-        }
-
-        .close-hint {
-            position: absolute;
-            bottom: 30px;
-            color: rgba(255,255,255,0.7);
-            font-size: 16px;
-            background: rgba(0,0,0,0.5);
-            padding: 8px 16px;
-            border-radius: 20px;
-            pointer-events: none;
-        }
-        /* === LOADING STATES === */
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            border-radius: 8px;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1e3a5f;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* === ERROR MESSAGE === */
-        .error-message {
-            color: #dc3545;
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 4px;
-            padding: 10px;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        /* === NOSCRIPT === */
-        .noscript-message {
-            text-align: center;
-            padding: 50px;
-            background: #fff3cd;
-            color: #856404;
-            border: 2px solid #ffeeba;
-            margin: 20px;
-            border-radius: 8px;
-            font-size: 18px;
-        }
-
-        /* === RESPONSIVE DESIGN === */
-        /* === MOBILE RESPONSIVE ENHANCEMENTS === */
-         @media (max-width: 768px) {
-            #zoomTitle {
-                font-size: 16px;
-                padding: 6px;
-            }
-            .navArrow {
-                font-size: 22px;
-                padding: 0 8px;
-            }
-            #zoomTitleContainer {
-                flex-wrap: wrap;
-            }
-        }
-        @media (max-width: 480px) {
-            #zoomTitle {
-                font-size: 14px;
-                padding: 4px;
-            }
-            .navArrow {
-                font-size: 20px;
-                padding: 0 6px;
-            }
-        }
-
-
-        /* === PRINT STYLES === */
-        @media print {
-            .controls, .navArrow, .modal, .zoomBtn {
-                display: none !important;
-            }
-            
-            .grid {
-                display: block;
-            }
-            
-            .card {
-                break-inside: avoid;
-                page-break-inside: avoid;
-                margin-bottom: 20px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="مقارنة القراءات العشر من مصاحف التيسير - اختر القراءات وعدد الأعمدة وقارن بينها">
+<meta name="author" content="هارون رشيد لون">
+<title>المقارنة التفاعلية لمصاحف القراءات العشر</title>
+<style>
+:root{--navy:#1e3a5f;--navy2:#2a4a7a;--bg:#f5f5f5;--card:#fff;--text:#1b1f24;--line:#d9dde3;--soft:#eef1f5;--accent:#1e3a5f;--on:#fff}
+:root[data-theme=dark]{--navy:#3b6aa8;--navy2:#4a7bc0;--bg:#12161c;--card:#1c222b;--text:#e6e9ee;--line:#333c49;--soft:#262e3a;--accent:#7fb0ee;--on:#fff}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.header{background:linear-gradient(135deg,#1e3a5f,#2a4a7a);color:#fff;text-align:center;padding:14px 20px;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.header h1{margin:0;font-size:clamp(20px,4vw,32px)}
+button,input,select{font:inherit;font-size:15px;padding:7px 14px;border-radius:8px;border:1.5px solid var(--navy);cursor:pointer;color:var(--text);background:var(--card)}
+button{background:var(--navy);color:var(--on);font-weight:bold}
+button:hover{background:var(--navy2)}
+button.ghost{background:var(--card);color:var(--text);border-color:var(--line);font-weight:normal}
+button.ghost:hover{background:var(--soft)}
+button.on{background:var(--navy);color:var(--on);border-color:var(--navy);font-weight:bold}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#pageInput{width:84px;text-align:center}
+select{max-width:170px}
+.bar{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 2px 4px rgba(0,0,0,.06);padding:10px 12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
+.row+.row{margin-top:8px}
+.lbl{font-size:14px;color:var(--text);opacity:.75}
+.seg{display:flex;gap:4px;align-items:center}
+.seg button{padding:5px 11px;min-width:38px}
+details{margin-top:8px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}
+summary{cursor:pointer;padding:8px 14px;font-weight:bold}
+.panel{padding:4px 12px 12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{display:flex;align-items:center;gap:6px;padding:5px 12px;border:1.5px solid var(--line);border-radius:20px;background:var(--card);cursor:pointer;user-select:none}
+.chip input{width:auto;padding:0;margin:0;accent-color:var(--navy)}
+.chip.sel{border-color:var(--navy);background:var(--navy);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:14px;padding:18px;max-width:1800px;margin:0 auto}
+.card{background:var(--card);padding:6px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,.1);display:flex;flex-direction:column;min-width:0}
+.title{display:flex;align-items:center;gap:4px;background:var(--navy);color:#fff;border-radius:8px;padding:6px 8px;margin-bottom:6px;font-weight:bold}
+.title .t{flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}
+.ic{cursor:pointer;padding:0 6px;font-size:20px;user-select:none;background:none;border:0;color:#fff;min-width:0;font-weight:bold}
+.ic:hover{color:#ffd700;background:none}
+.thumb{width:100%;height:auto;aspect-ratio:3/4;border:2px solid var(--line);border-radius:8px;cursor:zoom-in;background:var(--soft);object-fit:cover;transition:opacity .2s}
+.thumb.loading{opacity:.45}
+.empty{grid-column:1/-1;text-align:center;padding:50px 20px;opacity:.8}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);flex-direction:column;align-items:center;z-index:1000;padding:10px}
+.mbar{display:flex;gap:8px;align-items:center;width:100%;max-width:1100px;margin-bottom:8px}
+.mbar .mt{flex:1;text-align:center;background:var(--navy);color:#fff;font-weight:bold;padding:7px;border-radius:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mbar button{background:var(--navy);padding:6px 12px;min-width:0;color:#fff;border-color:#4a6a95}
+.mwrap{flex:1;overflow:auto;width:100%;display:flex;justify-content:center;align-items:flex-start;min-height:0}
+#zoomImage{max-width:none;border-radius:8px;border:3px solid #fff;background:#fff}
+.hint{color:rgba(255,255,255,.7);font-size:13px;margin-top:6px;text-align:center}
+.err{opacity:.6}
+[hidden]{display:none!important}
+.ibox{position:relative}.ibox img{display:block}
+.card.ref .title{background:#1d6b4f}
+.hl{position:absolute;border:2px solid;border-radius:3px;pointer-events:none}
+.hl[data-n]::after{content:"📝";position:absolute;top:-11px;right:-5px;font-size:14px}
+.ann .hl{pointer-events:auto;cursor:pointer}
+.ann .ibox{cursor:crosshair;touch-action:none}.ann .thumb{cursor:crosshair}
+.sw{width:28px;height:28px;min-width:0;padding:0;border-radius:50%}
+.sw.cur{outline:3px solid var(--text);outline-offset:2px}
+.notes div{font-size:13px;padding:4px 8px;margin-top:4px;border-right:4px solid;background:var(--soft);border-radius:6px;text-align:right}
+@media(max-width:600px){button,input,select{font-size:14px}.grid{gap:8px;padding:8px}.title .t{font-size:13px}.hint{display:none}}
+@media print{.bar,.modal,.ic{display:none!important}.card{break-inside:avoid}}
+</style>
 </head>
 <body>
-    <header class="header">
-        <h1>المقارنة التفاعلية لمصاحف القراءات العشر</h1>
-    </header>
+<header class="header"><h1>المقارنة التفاعلية لمصاحف القراءات العشر</h1></header>
 
-    <nav class="controls" role="toolbar" aria-label="أدوات التحكم في الصفحة">
-        <button onclick="prevPage()" aria-label="الصفحة السابقة" title="الصفحة السابقة">→</button>
-        <input type="number" id="pageInput" min="0" max="612" value="0" aria-label="رقم الصفحة" title="أدخل رقم الصفحة">
-        <button onclick="nextPage()" aria-label="الصفحة التالية" title="الصفحة التالية">←</button>
-
-        <select id="surahSelector" onchange="goToSurah()" aria-label="اختر السورة" title="اختر السورة للانتقال إليها">
-            <option value="">اختر السورة</option>
-        </select>
-
-        <select id="juzSelector" onchange="goToJuz()" aria-label="اختر الجزء" title="اختر الجزء للانتقال إليه">
-            <option value="">اختر الجزء</option>
-        </select>
-    </nav>
-
-    <main>
-        <div class="grid" id="pdfGrid"></div>
-    </main>
-
-    <div class="modal" id="zoomModal" onclick="outsideClick(event)" role="dialog" aria-modal="true" aria-label="عرض مكبر للصورة">
-        <div id="zoomTitleContainer">
-            <span class="navArrow" id="zoomPrev" aria-label="الصورة السابقة">→</span>
-            <div id="zoomTitle" class="centerTitle">عنوان الصورة</div>
-            <span class="navArrow" id="zoomNext" aria-label="الصورة التالية">←</span>
-        </div>
-        <img id="zoomImage" alt="صورة مكبرة للقراءة" onclick="event.stopPropagation()">
-        <div class="close-hint">اضغط ESC للخروج</div>
+<nav class="bar" aria-label="أدوات التحكم">
+  <div class="row">
+    <button onclick="go(-1)" title="الصفحة السابقة" aria-label="الصفحة السابقة">→</button>
+    <input type="number" id="pageInput" min="0" max="612" value="0" aria-label="رقم الصفحة">
+    <button onclick="go(1)" title="الصفحة التالية" aria-label="الصفحة التالية">←</button>
+    <select id="surahSel" aria-label="السورة"><option value="">السورة</option></select>
+    <select id="juzSel" aria-label="الجزء"><option value="">الجزء</option></select>
+    <button class="ghost" id="themeBtn" title="الوضع الليلي">🌙</button>
+  </div>
+  <div class="row">
+    <span class="lbl">الأعمدة:</span>
+    <select id="colSel" aria-label="عدد الأعمدة"></select>
+    <button class="ghost" id="refBtn" title="تثبيت قراءة مرجعية ومقارنتها بأخرى">📌 وضع المرجع</button>
+    <button class="ghost" id="annBtn" title="تظليل الفروق وكتابة ملاحظات">✏️ تعليم الفروق</button>
+  </div>
+  <div class="row" id="refRow" hidden>
+    <span class="lbl">المرجع:</span><select id="refSel"></select>
+    <span class="lbl">المقارنة:</span>
+    <button class="ghost" id="cPrev" title="القراءة السابقة">→</button>
+    <select id="cmpSel"></select>
+    <button class="ghost" id="cNext" title="القراءة التالية">←</button>
+    <button class="ghost" id="swapBtn" title="تبديل المرجع والمقارنة">⇄</button>
+  </div>
+  <div class="row" id="annRow" hidden>
+    <span class="lbl">اسحب على الصورة لتظليل موضع الفرق، وانقر على التظليل للتعديل أو الحذف</span>
+    <span class="seg" id="swatches"></span>
+    <button class="ghost" id="undoBtn">تراجع</button>
+    <button class="ghost" id="clrBtn">مسح تعليم الصفحة</button>
+    <button class="ghost" id="expBtn">تصدير</button>
+    <button class="ghost" id="impBtn">استيراد</button>
+    <input type="file" id="impFile" accept=".json" hidden>
+    <input id="pageNote" placeholder="ملاحظة على الصفحة" style="width:min(320px,95%);text-align:right;cursor:text">
+  </div>
+  <details id="pick">
+    <summary id="pickSum">اختيار القراءات</summary>
+    <div class="panel">
+      <div class="row" id="presets"></div>
+      <div class="chips" id="chips"></div>
     </div>
+  </details>
+</nav>
 
-    <noscript>
-        <div class="noscript-message" role="alert">
-            يرجى تفعيل JavaScript لاستخدام هذه الصفحة بشكل كامل.
-        </div>
-    </noscript>
+<main><div class="grid" id="grid"></div></main>
 
-    <script>
-        (function() {
-            "use strict";
+<div class="modal" id="zoomModal" role="dialog" aria-modal="true" aria-label="عرض مكبر">
+  <div class="mbar">
+    <button id="zPrev" title="الصفحة السابقة (→)">→</button>
+    <button id="zUp" title="القراءة السابقة (↑)">▲</button>
+    <div class="mt" id="zoomTitle"></div>
+    <button id="zDown" title="القراءة التالية (↓)">▼</button>
+    <button id="zNext" title="الصفحة التالية (←)">←</button>
+    <button id="zOut" title="تصغير (-)">−</button>
+    <button id="zIn" title="تكبير (+)">+</button>
+    <button id="zClose" title="إغلاق (Esc)">✕</button>
+  </div>
+  <div class="mwrap" id="mwrap"><div id="zbox" class="ibox" style="display:inline-block"><img id="zoomImage" alt=""></div></div>
+  <div class="hint">← → تغيير الصفحة · ↑ ↓ تغيير القراءة · + − تكبير · Esc إغلاق</div>
+</div>
 
-            // === CONFIGURATION ===
-            const CONFIG = {
-                basePath: ".",
-                maxPage: 612,
-                pageOffset: 4,
-                placeholderImage: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300' viewBox='0 0 200 300'%3E%3Crect width='200' height='300' fill='%23f0f0f0'/%3E%3Ctext x='50' y='150' font-family='Arial' font-size='14' fill='%23999'%3Eالصورة غير متوفرة%3C/text%3E%3C/svg%3E"
-            };
+<noscript><p style="text-align:center;padding:40px">يرجى تفعيل JavaScript لاستخدام هذه الصفحة.</p></noscript>
 
-            // === DATA ===
-            const pdfList = [
-                "حفص_عن_عاصم", "قالون_عن_نافع", "ورش_عن_نافع", "ابن_كثير_المكي",
-                "الدوري_عن_أبي_عمرو", "السوسي_عن_أبي_عمرو", "هشام_عن_ابن_عامر",
-                "ابن_ذكوان_عن_ابن_عامر", "شعبة_عن_عاصم", "خلف_عن_حمزة",
-                "خلاد_عن_حمزة", "الكسائي_الكوفي", "أبو_جعفر_المدني", "يعقوب_الحضرمي", "خلف_العاشر"
-            ];
+<script>
+(function(){
+"use strict";
+const BASE=".", MAX=612, OFF=4;
+const R=[
+ ["حفص عن عاصم","حفص_عن_عاصم"],["قالون عن نافع","قالون_عن_نافع"],["ورش عن نافع","ورش_عن_نافع"],
+ ["ابن كثير المكي","ابن_كثير_المكي"],["الدوري عن أبي عمرو","الدوري_عن_أبي_عمرو"],["السوسي عن أبي عمرو","السوسي_عن_أبي_عمرو"],
+ ["هشام عن ابن عامر","هشام_عن_ابن_عامر"],["ابن ذكوان عن ابن عامر","ابن_ذكوان_عن_ابن_عامر"],["شعبة عن عاصم","شعبة_عن_عاصم"],
+ ["خلف عن حمزة","خلف_عن_حمزة"],["خلاد عن حمزة","خلاد_عن_حمزة"],["الكسائي الكوفي","الكسائي_الكوفي"],
+ ["أبو جعفر المدني","أبو_جعفر_المدني"],["يعقوب الحضرمي","يعقوب_الحضرمي"],["خلف العاشر","خلف_العاشر"]
+];
+const PRESETS=[
+ ["الكل",R.map((_,i)=>i)],["حفص وورش",[0,2]],["حفص وقالون وورش",[0,1,2]],["حفص وقالون وورش والدوري",[0,1,2,4]],
+ ["عن نافع",[1,2]],["عن عاصم",[0,8]],["عن أبي عمرو",[4,5]],["عن ابن عامر",[6,7]],["عن حمزة",[9,10]],
+ ["القراءات الثلاث المتممة",[12,13,14]],["مسح",[]]
+];
+const S="الفاتحة:1,البقرة:2,آل عمران:50,النساء:77,المائدة:106,الأنعام:128,الأعراف:151,الأنفال:177,التوبة:187,يونس:208,هود:221,يوسف:235,الرعد:249,ابراهيم:255,الحجر:262,النحل:267,الإسراء:282,الكهف:293,مريم:305,طه:312,الأنبياء:322,الحج:332,المؤمنون:342,النور:350,الفرقان:359,الشعراء:367,النمل:377,القصص:385,العنكبوت:396,الروم:404,لقمان:411,السجدة:415,الأحزاب:418,سبأ:428,فاطر:434,يس:440,الصافات:446,ص:453,الزمر:458,غافر:467,فصلت:477,الشورى:483,الزخرف:489,الدخان:496,الجاثية:499,الأحقاف:502,محمد:507,الفتح:511,الحجرات:515,ق:518,الذاريات:520,الطور:523,النجم:526,القمر:528,الرحمن:531,الواقعة:534,الحديد:537,المجادلة:542,الحشر:545,الممتحنة:549,الصف:551,الجمعة:553,المنافقون:554,التغابن:556,الطلاق:558,التحريم:560,الملك:562,القلم:564,الحاقة:566,المعارج:568,نوح:570,الجن:572,المزمل:574,المدثر:575,القيامة:577,الإنسان:578,المرسلات:580,النبأ:582,النازعات:583,عبس:585,التكوير:586,الانفطار:587,المطففين:587,الانشقاق:589,البروج:590,الطارق:591,الأعلى:591,الغاشية:592,الفجر:593,البلد:594,الشمس:595,الليل:595,الضحى:596,الشرح:596,التين:597,العلق:597,القدر:598,البينة:598,الزلزلة:599,العاديات:599,القارعة:600,التكاثر:600,العصر:601,الهمزة:601,الفيل:601,قريش:602,الماعون:602,الكوثر:602,الكافرون:603,النصر:603,المسد:603,الإخلاص:604,الفلق:604,الناس:604";
+const surahs=S.split(",").map(x=>{const[a,b]=x.split(":");return{name:a,page:+b}});
+const juz=[1,22,42,62,82,102,122,142,162,182,202,222,242,262,282,302,322,342,362,382,402,422,442,462,482,502,522,542,562,582];
 
-            const pdfTitles = [
-                "حفص عن عاصم", "قالون عن نافع", "ورش عن نافع", "ابن كثير المكي",
-                "الدوري عن أبي عمرو", "السوسي عن أبي عمرو", "هشام عن ابن عامر",
-                "ابن ذكوان عن ابن عامر", "شعبة عن عاصم", "خلف عن حمزة",
-                "خلاد عن حمزة", "الكسائي الكوفي", "أبو جعفر المدني", "يعقوب الحضرمي", "خلف العاشر"
-            ];
+const $=id=>document.getElementById(id);
+const load=(k,d)=>{try{const v=localStorage.getItem("qr_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}};
+const save=(k,v)=>{try{localStorage.setItem("qr_"+k,JSON.stringify(v))}catch(e){}};
 
-            // سور القرآن مع أرقام الصفحات
-            const surahIndex = [
-                { name: "الفاتحة", page: 1 }, { name: "البقرة", page: 2 }, { name: "آل عمران", page: 50 },
-                { name: "النساء", page: 77 }, { name: "المائدة", page: 106 }, { name: "الأنعام", page: 128 },
-                { name: "الأعراف", page: 151 }, { name: "الأنفال", page: 177 }, { name: "التوبة", page: 187 },
-                { name: "يونس", page: 208 }, { name: "هود", page: 221 }, { name: "يوسف", page: 235 },
-                { name: "الرعد", page: 249 }, { name: "ابراهيم", page: 255 }, { name: "الحجر", page: 262 },
-                { name: "النحل", page: 267 }, { name: "الإسراء", page: 282 }, { name: "الكهف", page: 293 },
-                { name: "مريم", page: 305 }, { name: "طه", page: 312 }, { name: "الأنبياء", page: 322 },
-                { name: "الحج", page: 332 }, { name: "المؤمنون", page: 342 }, { name: "النور", page: 350 },
-                { name: "الفرقان", page: 359 }, { name: "الشعراء", page: 367 }, { name: "النمل", page: 377 },
-                { name: "القصص", page: 385 }, { name: "العنكبوت", page: 396 }, { name: "الروم", page: 404 },
-                { name: "لقمان", page: 411 }, { name: "السجدة", page: 415 }, { name: "الأحزاب", page: 418 },
-                { name: "سبأ", page: 428 }, { name: "فاطر", page: 434 }, { name: "يس", page: 440 },
-                { name: "الصافات", page: 446 }, { name: "ص", page: 453 }, { name: "الزمر", page: 458 },
-                { name: "غافر", page: 467 }, { name: "فصلت", page: 477 }, { name: "الشورى", page: 483 },
-                { name: "الزخرف", page: 489 }, { name: "الدخان", page: 496 }, { name: "الجاثية", page: 499 },
-                { name: "الأحقاف", page: 502 }, { name: "محمد", page: 507 }, { name: "الفتح", page: 511 },
-                { name: "الحجرات", page: 515 }, { name: "ق", page: 518 }, { name: "الذاريات", page: 520 },
-                { name: "الطور", page: 523 }, { name: "النجم", page: 526 }, { name: "القمر", page: 528 },
-                { name: "الرحمن", page: 531 }, { name: "الواقعة", page: 534 }, { name: "الحديد", page: 537 },
-                { name: "المجادلة", page: 542 }, { name: "الحشر", page: 545 }, { name: "الممتحنة", page: 549 },
-                { name: "الصف", page: 551 }, { name: "الجمعة", page: 553 }, { name: "المنافقون", page: 554 },
-                { name: "التغابن", page: 556 }, { name: "الطلاق", page: 558 }, { name: "التحريم", page: 560 },
-                { name: "الملك", page: 562 }, { name: "القلم", page: 564 }, { name: "الحاقة", page: 566 },
-                { name: "المعارج", page: 568 }, { name: "نوح", page: 570 }, { name: "الجن", page: 572 },
-                { name: "المزمل", page: 574 }, { name: "المدثر", page: 575 }, { name: "القيامة", page: 577 },
-                { name: "الإنسان", page: 578 }, { name: "المرسلات", page: 580 }, { name: "النبأ", page: 582 },
-                { name: "النازعات", page: 583 }, { name: "عبس", page: 585 }, { name: "التكوير", page: 586 },
-                { name: "الانفطار", page: 587 }, { name: "المطففين", page: 587 }, { name: "الانشقاق", page: 589 },
-                { name: "البروج", page: 590 }, { name: "الطارق", page: 591 }, { name: "الأعلى", page: 591 },
-                { name: "الغاشية", page: 592 }, { name: "الفجر", page: 593 }, { name: "البلد", page: 594 },
-                { name: "الشمس", page: 595 }, { name: "الليل", page: 595 }, { name: "الضحى", page: 596 },
-                { name: "الشرح", page: 596 }, { name: "التين", page: 597 }, { name: "العلق", page: 597 },
-                { name: "القدر", page: 598 }, { name: "البينة", page: 598 }, { name: "الزلزلة", page: 599 },
-                { name: "العاديات", page: 599 }, { name: "القارعة", page: 600 }, { name: "التكاثر", page: 600 },
-                { name: "العصر", page: 601 }, { name: "الهمزة", page: 601 }, { name: "الفيل", page: 601 },
-                { name: "قريش", page: 602 }, { name: "الماعون", page: 602 }, { name: "الكوثر", page: 602 },
-                { name: "الكافرون", page: 603 }, { name: "النصر", page: 603 }, { name: "المسد", page: 603 },
-                { name: "الإخلاص", page: 604 }, { name: "الفلق", page: 604 }, { name: "الناس", page: 604 }
-            ];
+let page=0, sel=load("sel",R.map((_,i)=>i)).filter(i=>R[i]), cols=load("cols",0),
+    theme=load("theme",matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"), zi=0, zz=1,
+    refOn=load("refOn",false), ref=load("ref",0), cmp=load("cmp",1), ann=false, color=load("color","#f5b800"),
+    marks=load("marks",{}), pnotes=load("pnotes",{}), hist=[];
+const list=()=>refOn?[ref,cmp]:sel;
+const hp=parseInt((location.hash.match(/p=(\d+)/)||[])[1]);
+if(hp>=0&&hp<=MAX)page=hp;
 
-            // أجزاء القرآن (صفحات بداية كل جزء)
-            const juzIndex = [
-                1, 22, 42, 62, 82, 102, 122, 142, 162, 182,
-                202, 222, 242, 262, 282, 302, 322, 342, 362, 382,
-                402, 422, 442, 462, 482, 502, 522, 542, 562, 582
-            ];
+const imgNum=p=>p===0?1:p+OFF;
+const src=(i,p)=>`${BASE}/${encodeURIComponent(R[i][1])}/page${String(imgNum(p)).padStart(3,"0")}.jpg`;
+const effCols=()=>{const n=list().length||1;const maxFit=Math.max(1,Math.floor(innerWidth/(innerWidth<600?150:230)));
+  return Math.max(1,Math.min(cols||n,n,maxFit>0?maxFit:1))};
 
-            // === STATE ===
-            let currentPage = 0;
-            let zoomFolder = "";
-            let zoomPage = 0;
-            let isLoading = false;
+function init(){
+  surahs.forEach(s=>{const o=document.createElement("option");o.value=s.page;o.textContent=s.name;$("surahSel").appendChild(o)});
+  juz.forEach((p,i)=>{const o=document.createElement("option");o.value=p;o.textContent="الجزء "+(i+1);$("juzSel").appendChild(o)});
+  $("colSel").onchange=e=>{cols=+e.target.value;save("cols",cols);apply()};
+  PRESETS.forEach(([t,ids])=>{const b=document.createElement("button");b.className="ghost";b.textContent=t;
+    b.onclick=()=>{sel=ids.slice();save("sel",sel);buildChips();render()};$("presets").appendChild(b)});
+  $("surahSel").onchange=e=>{if(e.target.value)setPage(+e.target.value)};
+  $("juzSel").onchange=e=>{if(e.target.value)setPage(+e.target.value)};
+  $("pageInput").onchange=()=>{const p=parseInt($("pageInput").value);
+    if(p>=0&&p<=MAX)setPage(p);else $("pageInput").value=page};
+  $("themeBtn").onclick=()=>{theme=theme==="dark"?"light":"dark";save("theme",theme);apply()};
+  $("zPrev").onclick=()=>zPage(-1);$("zNext").onclick=()=>zPage(1);
+  $("zUp").onclick=()=>zQ(-1);$("zDown").onclick=()=>zQ(1);
+  $("zIn").onclick=()=>zoomBy(.25);$("zOut").onclick=()=>zoomBy(-.25);$("zClose").onclick=closeZ;
+  $("zoomModal").addEventListener("click",e=>{if(e.target.id==="zoomModal"||e.target.id==="mwrap")closeZ()});
+  let sx=0;
+  $("zoomModal").addEventListener("touchstart",e=>{sx=e.changedTouches[0].screenX},{passive:true});
+  $("zoomModal").addEventListener("touchend",e=>{const d=sx-e.changedTouches[0].screenX;
+    if(zz===1&&Math.abs(d)>60)zPage(d>0?-1:1)},{passive:true});
+  document.addEventListener("keydown",keys);
+  addEventListener("resize",apply);
+  addEventListener("hashchange",()=>{const p=parseInt((location.hash.match(/p=(\d+)/)||[])[1]);
+    if(p>=0&&p<=MAX&&p!==page){page=p;render()}});
+  R.forEach((r,i)=>["refSel","cmpSel"].forEach(id=>{const o=document.createElement("option");o.value=i;o.textContent=r[0];$(id).appendChild(o)}));
+  $("refSel").onchange=e=>{ref=+e.target.value;if(cmp===ref)cmp=(ref+1)%R.length;saveRef();render()};
+  $("cmpSel").onchange=e=>{cmp=+e.target.value;if(cmp===ref)ref=(cmp+1)%R.length;saveRef();render()};
+  const step=d=>{let c=cmp;do{c=(c+d+R.length)%R.length}while(c===ref);cmp=c;saveRef();render()};
+  $("cPrev").onclick=()=>step(-1);$("cNext").onclick=()=>step(1);
+  $("swapBtn").onclick=()=>{[ref,cmp]=[cmp,ref];saveRef();render()};
+  $("refBtn").onclick=()=>{refOn=!refOn;save("refOn",refOn);render()};
+  $("annBtn").onclick=()=>{ann=!ann;apply()};
+  ["#f5b800","#e5484d","#2f9e44"].forEach(c=>{const b=document.createElement("button");b.className="sw";b.dataset.c=c;b.style.background=c;
+    b.title="لون التظليل";b.onclick=()=>{color=c;save("color",c);apply()};$("swatches").appendChild(b)});
+  $("undoBtn").onclick=()=>{const k=hist.pop();if(k&&marks[k]){marks[k].pop();if(!marks[k].length)delete marks[k];save("marks",marks);paintAll()}};
+  $("clrBtn").onclick=()=>{if(!confirm("مسح كل التعليمات على هذه الصفحة؟"))return;list().forEach(ri=>delete marks[ri+":"+page]);save("marks",marks);paintAll()};
+  $("pageNote").oninput=e=>{const v=e.target.value;if(v.trim())pnotes[page]=v;else delete pnotes[page];save("pnotes",pnotes)};
+  $("expBtn").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify({marks,pnotes})],{type:"application/json"}));
+    a.download="qiraat-notes.json";a.click();URL.revokeObjectURL(a.href)};
+  $("impBtn").onclick=()=>$("impFile").click();
+  $("impFile").onchange=e=>{const f=e.target.files[0];if(!f)return;
+    f.text().then(t=>{try{const d=JSON.parse(t);Object.keys(d.marks||{}).forEach(k=>marks[k]=(marks[k]||[]).concat(d.marks[k]));
+      Object.assign(pnotes,d.pnotes||{});save("marks",marks);save("pnotes",pnotes);render()}catch(x){alert("ملف غير صالح")}});e.target.value=""};
+  attach($("zbox"),()=>list()[zi]);
+  buildChips();apply();render();
+}
+const saveRef=()=>{save("ref",ref);save("cmp",cmp)};
 
-            // === DOM ELEMENTS ===
-            const surahSelector = document.getElementById("surahSelector");
-            const juzSelector = document.getElementById("juzSelector");
-            const pageInput = document.getElementById("pageInput");
-            const grid = document.getElementById("pdfGrid");
-            const zoomModal = document.getElementById("zoomModal");
-            const zoomImage = document.getElementById("zoomImage");
-            const zoomTitle = document.getElementById("zoomTitle");
-            const zoomPrev = document.getElementById("zoomPrev");
-            const zoomNext = document.getElementById("zoomNext");
+function buildChips(){
+  const c=$("chips");c.innerHTML="";
+  R.forEach((r,i)=>{const l=document.createElement("label");l.className="chip"+(sel.includes(i)?" sel":"");
+    const cb=document.createElement("input");cb.type="checkbox";cb.checked=sel.includes(i);
+    cb.onchange=()=>{toggle(i,cb.checked)};
+    l.appendChild(cb);l.appendChild(document.createTextNode(r[0]));c.appendChild(l)});
+  $("pickSum").textContent=`اختيار القراءات (${sel.length} من ${R.length})`;
+}
+function toggle(i,on){
+  sel=on?[...sel,i].sort((a,b)=>a-b):sel.filter(x=>x!==i);
+  save("sel",sel);buildChips();render();
+}
 
-            // === INITIALIZATION FUNCTIONS ===
-            function initializeSelectors() {
-                // Populate surah selector
-                surahIndex.forEach(s => {
-                    const opt = document.createElement("option");
-                    opt.value = s.page;
-                    opt.textContent = s.name;
-                    surahSelector.appendChild(opt);
-                });
+function apply(){
+  document.documentElement.dataset.theme=theme;
+  $("themeBtn").textContent=theme==="dark"?"☀️":"🌙";
+  $("refRow").hidden=!refOn;$("annRow").hidden=!ann;$("pick").hidden=refOn;
+  $("refBtn").classList.toggle("on",refOn);$("annBtn").classList.toggle("on",ann);
+  document.body.classList.toggle("ann",ann);$("refSel").value=ref;$("cmpSel").value=cmp;
+  document.querySelectorAll(".sw").forEach(b=>b.classList.toggle("cur",b.dataset.c===color));
+  $("grid").style.setProperty("--cols",effCols());
+  const cs=$("colSel"),mx=Math.min(6,Math.max(1,list().length));
+  if(+cs.dataset.mx!==mx){cs.dataset.mx=mx;cs.innerHTML="";
+    for(let v=0;v<=mx;v++){const o=document.createElement("option");o.value=v;o.textContent=v?v+(v===1?" عمود":" أعمدة"):"تلقائي";cs.appendChild(o)}}
+  cs.value=Math.min(cols,mx);
+}
 
-                // Populate juz selector
-                juzIndex.forEach((p, i) => {
-                    const opt = document.createElement("option");
-                    opt.value = p;
-                    opt.textContent = "الجزء " + (i + 1);
-                    juzSelector.appendChild(opt);
-                });
-            }
+function setPage(p){page=Math.max(0,Math.min(MAX,p));render()}
+function go(d){setPage(page+d)}
+window.go=go;
 
-            function updateSelectors() {
+function syncSelectors(){
+  let s="",j="";
+  if(page>0){
+    for(let i=0;i<surahs.length;i++)if(surahs[i].page<=page)s=surahs[i].page;
+    for(let i=0;i<juz.length;i++)if(juz[i]<=page)j=juz[i];
+  }
+  $("surahSel").value=s;$("juzSel").value=j;
+}
 
-                // 🔹 If page 0 → show "اختر..."
-                if (currentPage === 0) {
-                    surahSelector.value = "";
-                    juzSelector.value = "";
-                    return;
-                }
+function render(){
+  $("pageInput").value=page;
+  syncSelectors();apply();
+  $("pageNote").value=pnotes[page]||"";
+  history.replaceState(null,"","#p="+page);
+  const g=$("grid");g.innerHTML="";
+  const L=list();
+  if(!L.length){g.innerHTML='<div class="empty">لم تختر أي قراءة. افتح «اختيار القراءات» وحدد قراءة أو أكثر.</div>';return}
+  L.forEach((ri,idx)=>{
+    const card=document.createElement("div");card.className="card"+(refOn&&idx===0?" ref":"");
+    const t=document.createElement("div");t.className="title";
+    const mk=(txt,fn,lab)=>{const b=document.createElement("button");b.className="ic";b.textContent=txt;b.title=lab;b.setAttribute("aria-label",lab);
+      b.onclick=e=>{e.stopPropagation();fn()};return b};
+    const name=document.createElement("span");name.className="t";name.textContent=(refOn&&idx===0?"📌 ":"")+R[ri][0];
+    t.append(mk("→",()=>go(-1),"الصفحة السابقة"),name,mk("←",()=>go(1),"الصفحة التالية"));
+    if(!refOn)t.append(mk("✕",()=>toggle(ri,false),"إخفاء هذه القراءة"));
+    const box=document.createElement("div");box.className="ibox";box.dataset.ri=ri;
+    const img=document.createElement("img");img.className="thumb loading";img.loading="lazy";img.draggable=false;
+    img.src=src(ri,page);img.alt=`${R[ri][0]} - صفحة ${page}`;
+    img.onload=()=>img.classList.remove("loading");
+    img.onerror=()=>{img.classList.remove("loading");img.classList.add("err");
+      img.src="data:image/svg+xml,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='300' height='400'><rect width='300' height='400' fill='#e6e8ec'/><text x='150' y='200' font-family='Arial' font-size='18' fill='#888' text-anchor='middle'>الصورة غير متوفرة</text></svg>")};
+    img.onclick=()=>{if(!ann)openZ(idx)};
+    box.appendChild(img);
+    const nt=document.createElement("div");nt.className="notes";
+    card.append(t,box,nt);g.appendChild(card);
+    attach(box,()=>ri);paint(box,ri);
+  });
+  preload(page+1);
+}
 
-                // ===== SURAH AUTO-DETECT =====
-                let selectedSurah = "";
+/* ---- highlights & notes ---- */
+function paint(box,ri){
+  box.querySelectorAll(".hl").forEach(n=>n.remove());
+  const nt=box.nextElementSibling&&box.nextElementSibling.classList.contains("notes")?box.nextElementSibling:null;
+  if(nt)nt.innerHTML="";
+  (marks[ri+":"+page]||[]).forEach((m,k)=>{
+    const d=document.createElement("div");d.className="hl";
+    Object.assign(d.style,{left:m.x*100+"%",top:m.y*100+"%",width:m.w*100+"%",height:m.h*100+"%",borderColor:m.c,background:m.c+"40"});
+    if(m.n){d.dataset.n="1";d.title=m.n;
+      if(nt){const p=document.createElement("div");p.textContent="📝 "+m.n;p.style.borderColor=m.c;nt.appendChild(p)}}
+    d.onclick=e=>{if(ann){e.stopPropagation();editMark(ri,k)}};
+    box.appendChild(d);
+  });
+}
+function paintAll(){
+  document.querySelectorAll("#grid .ibox").forEach(b=>paint(b,+b.dataset.ri));
+  if(open()&&list()[zi]!=null)paint($("zbox"),list()[zi]);
+}
+function editMark(ri,k){
+  const key=ri+":"+page,a=marks[key],m=a[k];
+  const n=prompt("ملاحظة على هذا التظليل (اتركها فارغة لإزالة الملاحظة). زر «إلغاء» يعرض خيار الحذف:",m.n||"");
+  if(n===null){if(confirm("حذف هذا التظليل؟")){a.splice(k,1);if(!a.length)delete marks[key]}}
+  else m.n=n.trim();
+  save("marks",marks);paintAll();
+}
+function attach(box,getRi){
+  box.addEventListener("pointerdown",e=>{
+    if(!ann||e.target.classList.contains("hl")||e.button>0)return;
+    e.preventDefault();
+    const r=box.getBoundingClientRect(),cl=v=>Math.max(0,Math.min(1,v));
+    const x0=cl((e.clientX-r.left)/r.width),y0=cl((e.clientY-r.top)/r.height);
+    const d=document.createElement("div");d.className="hl";d.style.borderColor=color;d.style.background=color+"40";box.appendChild(d);
+    let x=x0,y=y0;
+    const mv=ev=>{x=cl((ev.clientX-r.left)/r.width);y=cl((ev.clientY-r.top)/r.height);
+      Object.assign(d.style,{left:Math.min(x,x0)*100+"%",top:Math.min(y,y0)*100+"%",width:Math.abs(x-x0)*100+"%",height:Math.abs(y-y0)*100+"%"})};
+    const up=()=>{removeEventListener("pointermove",mv);removeEventListener("pointerup",up);removeEventListener("pointercancel",up);
+      d.remove();const w=Math.abs(x-x0),h=Math.abs(y-y0);if(w<.01||h<.01)return;
+      const n=prompt("ملاحظة على هذا الموضع (اختياري):","");if(n===null)return;
+      const ri=getRi(),key=ri+":"+page;
+      (marks[key]=marks[key]||[]).push({x:Math.min(x,x0),y:Math.min(y,y0),w,h,c:color,n:n.trim()});
+      hist.push(key);save("marks",marks);paintAll()};
+    addEventListener("pointermove",mv);addEventListener("pointerup",up);addEventListener("pointercancel",up);
+  });
+}
+function preload(p){if(p>MAX)return;list().forEach(i=>{const m=new Image();m.src=src(i,p)})}
 
-                for (let i = 0; i < surahIndex.length; i++) {
-                    const start = surahIndex[i].page;
-                    const next = i < surahIndex.length - 1
-                        ? surahIndex[i + 1].page
-                        : CONFIG.maxPage + 1;
+/* ---- zoom ---- */
+const open=()=>$("zoomModal").style.display==="flex";
+function openZ(idx){zi=idx;zz=1;$("zoomModal").style.display="flex";document.body.style.overflow="hidden";showZ()}
+function closeZ(){$("zoomModal").style.display="none";document.body.style.overflow=""}
+function showZ(){
+  const ri=list()[zi];if(ri==null)return closeZ();
+  $("zoomImage").src=src(ri,page);$("zoomImage").alt=R[ri][0];
+  $("zoomTitle").textContent=`${R[ri][0]} — صفحة ${page}`;
+  zoomBy(0);paint($("zbox"),ri);
+}
+function zoomBy(d){zz=Math.max(.5,Math.min(3,zz+d));
+  const im=$("zoomImage"),zb=$("zbox");
+  if(zz<=1){im.style.maxWidth="calc(100vw - 30px)";im.style.maxHeight="calc(100vh - 110px)";im.style.width="auto";
+    zb.style.transform=zz<1?"scale("+zz+")":"";zb.style.transformOrigin="top center"}
+  else{im.style.maxWidth="none";im.style.maxHeight="none";zb.style.transform="";
+    im.style.width=Math.min(zz*Math.min(innerWidth-30,1000),3000)+"px"}
+}
+function zPage(d){const p=page+d;if(p<0||p>MAX)return;page=p;render();showZ()}
+function zQ(d){const n=list().length;if(!n)return;zi=(zi+d+n)%n;showZ()}
 
-                    if (currentPage >= start && currentPage < next) {
-                        selectedSurah = start;
-                        break;
-                    }
-                }
+function keys(e){
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(open()){
+    const m={ArrowLeft:()=>zPage(1),ArrowRight:()=>zPage(-1),ArrowUp:()=>zQ(-1),ArrowDown:()=>zQ(1),
+      Escape:closeZ,"+":()=>zoomBy(.25),"=":()=>zoomBy(.25),"-":()=>zoomBy(-.25)};
+    if(m[e.key]){e.preventDefault();m[e.key]()}return}
+  if(tag==="input"||tag==="select"||tag==="textarea")return;
+  const m={ArrowLeft:()=>go(1),ArrowRight:()=>go(-1),Home:()=>setPage(0),End:()=>setPage(MAX),
+    PageUp:()=>go(-10),PageDown:()=>go(10)};
+  if(m[e.key]){e.preventDefault();m[e.key]()}
+}
 
-                surahSelector.value = selectedSurah;
-
-                // ===== JUZ AUTO-DETECT =====
-                let selectedJuz = "";
-
-                for (let i = 0; i < juzIndex.length; i++) {
-                    const start = juzIndex[i];
-                    const next = i < juzIndex.length - 1
-                        ? juzIndex[i + 1]
-                        : CONFIG.maxPage + 1;
-
-                    if (currentPage >= start && currentPage < next) {
-                        selectedJuz = start;
-                        break;
-                    }
-                }
-
-                juzSelector.value = selectedJuz;
-            }
-
-            // === UTILITY FUNCTIONS ===
-            function getImageNumber(displayPage) {
-                return displayPage === 0 ? 1 : displayPage + CONFIG.pageOffset;
-            }
-
-            function showLoading(element) {
-                if (!element) return;
-                isLoading = true;
-                element.classList.add('loading');
-            }
-
-            function hideLoading(element) {
-                if (!element) return;
-                isLoading = false;
-                element.classList.remove('loading');
-            }
-
-            function handleImageError(img, title) {
-                img.src = CONFIG.placeholderImage;
-                img.alt = `الصورة غير متوفرة - ${title}`;
-                console.warn(`Failed to load image for ${title}`);
-            }
-
-            // === CORE RENDERING ===
-            function renderPage() {
-                if (isLoading) return;
-                
-                pageInput.value = currentPage;
-                updateSelectors();  
-                grid.innerHTML = "";
-
-                pdfList.forEach((folder, i) => {
-                    const folderEnc = encodeURIComponent(folder);
-                    const imgNumber = getImageNumber(currentPage);
-                    const imgPath = `${CONFIG.basePath}/${folderEnc}/page${String(imgNumber).padStart(3, '0')}.jpg`;
-
-                    // Create card elements
-                    const card = document.createElement("div");
-                    card.className = "card";
-
-                    // Title section with navigation
-                    const title = document.createElement("div");
-                    title.className = "title";
-
-                    const prev = document.createElement("span");
-                    prev.className = "navArrow";
-                    prev.innerHTML = "→";
-                    prev.setAttribute("aria-label", "الصفحة السابقة");
-                    prev.onclick = (e) => {
-                        e.stopPropagation();
-                        prevPage();
-                    };
-
-                    const center = document.createElement("span");
-                    center.className = "centerTitle";
-                    center.textContent = pdfTitles[i];
-
-                    const next = document.createElement("span");
-                    next.className = "navArrow";
-                    next.innerHTML = "←";
-                    next.setAttribute("aria-label", "الصفحة التالية");
-                    next.onclick = (e) => {
-                        e.stopPropagation();
-                        nextPage();
-                    };
-
-                    title.appendChild(prev);
-                    title.appendChild(center);
-                    title.appendChild(next);
-
-                    // Image element
-                    const img = document.createElement("img");
-                    img.className = "thumbnail";
-                    img.loading = "lazy";
-                    img.src = imgPath;
-                    img.alt = `${pdfTitles[i]} - صفحة ${imgNumber}`;
-                    
-                    // Image event handlers
-                    img.onclick = () => openZoom(imgPath, folder, imgNumber, pdfTitles[i]);
-                    img.onerror = function() {
-                        handleImageError(this, pdfTitles[i]);
-                    };
-                    img.onload = function() {
-                        this.classList.remove('loading');
-                    };
-
-                    // Assemble card
-                    card.appendChild(title);
-                    card.appendChild(img);
-                    grid.appendChild(card);
-                });
-            }
-
-            // === NAVIGATION FUNCTIONS ===
-            function nextPage() {
-                if (currentPage < CONFIG.maxPage) {
-                    currentPage++;
-                    renderPage();
-                }
-            }
-
-            function prevPage() {
-                if (currentPage > 0) {
-                    currentPage--;
-                    renderPage();
-                }
-            }
-
-            function jumpPage() {
-                const p = parseInt(pageInput.value);
-                if (!isNaN(p) && p >= 0 && p <= CONFIG.maxPage) {
-                    currentPage = p;
-                    renderPage();
-                } else {
-                    alert(`الرجاء إدخال رقم صفحة صحيح (0-${CONFIG.maxPage})`);
-                    pageInput.value = currentPage;
-                }
-            }
-
-            function goToSurah() {
-                const p = parseInt(surahSelector.value);
-                if (!isNaN(p)) {
-                    currentPage = p;
-                    renderPage();
-                }
-            }
-
-            function goToJuz() {
-                const p = parseInt(juzSelector.value);
-                if (!isNaN(p)) {
-                    currentPage = p;
-                    renderPage();
-                }
-            }
-
-            // === ZOOM FUNCTIONS ===
-            function openZoom(src, folder, page, titleText) {
-                zoomFolder = folder;
-                // Convert image number back to logical page
-                currentPage = page <= 5 ? 0 : page - CONFIG.pageOffset;
-                zoomPage = getImageNumber(currentPage);
-                zoomImage.src = src;
-                zoomTitle.textContent = titleText;
-                zoomModal.style.display = "flex";
-                document.body.style.overflow = "hidden"; // Prevent background scrolling
-                
-                // Preload adjacent images
-                preloadAdjacentImages(folder, page);
-            }
-
-            function closeModal() {
-                zoomModal.style.display = "none";
-                document.body.style.overflow = ""; // Restore scrolling
-            }
-
-            function outsideClick(e) {
-                if (e.target.id === "zoomModal") {
-                    closeModal();
-                }
-            }
-
-            function preloadAdjacentImages(folder, page) {
-                const folderEnc = encodeURIComponent(folder);
-                
-                // Preload next image
-                if (page < CONFIG.maxPage + CONFIG.pageOffset) {
-                    const nextImg = new Image();
-                    nextImg.src = `${CONFIG.basePath}/${folderEnc}/page${String(page + 1).padStart(3, '0')}.jpg`;
-                }
-                
-                // Preload previous image
-                if (page > 1) {
-                    const prevImg = new Image();
-                    prevImg.src = `${CONFIG.basePath}/${folderEnc}/page${String(page - 1).padStart(3, '0')}.jpg`;
-                }
-            }
-
-            function updateZoomImage() {
-                if (!zoomFolder) return;
-
-                // 🔥 Forward Skip (001 → 005)
-                if (zoomPage === 2) {
-                    zoomPage = CONFIG.pageOffset + 1; 
-                }
-
-                // 🔥 Backward Skip (005 → 001)
-                if (zoomPage > 1 && zoomPage <= CONFIG.pageOffset) {
-                    zoomPage = 1;
-                }
-
-                const folderEnc = encodeURIComponent(zoomFolder);
-                const newSrc = `${CONFIG.basePath}/${folderEnc}/page${String(zoomPage).padStart(3, '0')}.jpg`;
-
-                zoomImage.src = newSrc;
-
-                // 🔄 Synchronize logical page
-                if (zoomPage === 1) {
-                    currentPage = 0;
-                } else {
-                    currentPage = zoomPage - CONFIG.pageOffset;
-                }
-
-                renderPage();
-                preloadAdjacentImages(zoomFolder, zoomPage);
-            }
-            // === KEYBOARD NAVIGATION ===
-            function handleKeyDown(e) {
-                // Zoom modal keyboard controls
-                if (zoomModal.style.display === "flex") {
-                    switch(e.key) {
-                        case "ArrowLeft":
-                            e.preventDefault();
-                            zoomPage++;
-                            updateZoomImage();
-                            break;
-                        case "ArrowRight":
-                            e.preventDefault();
-                            if (zoomPage > 1) {
-                                zoomPage--;
-                                updateZoomImage();
-                            }
-                            break;
-                        case "Escape":
-                            e.preventDefault();
-                            closeModal();
-                            break;
-                    }
-                } else {
-                    // Main page keyboard controls
-                    switch(e.key) {
-                        case "ArrowLeft":
-                            e.preventDefault();
-                            nextPage(); // RTL: left arrow goes to next page
-                            break;
-                        case "ArrowRight":
-                            e.preventDefault();
-                            prevPage(); // RTL: right arrow goes to previous page
-                            break;
-                        case "Home":
-                            e.preventDefault();
-                            currentPage = 0;
-                            renderPage();
-                            break;
-                        case "End":
-                            e.preventDefault();
-                            currentPage = CONFIG.maxPage;
-                            renderPage();
-                            break;
-                        case "PageUp":
-                            e.preventDefault();
-                            currentPage = Math.max(0, currentPage - 10);
-                            renderPage();
-                            break;
-                        case "PageDown":
-                            e.preventDefault();
-                            currentPage = Math.min(CONFIG.maxPage, currentPage + 10);
-                            renderPage();
-                            break;
-                    }
-                }
-            }
-
-            // === EVENT LISTENERS ===
-            function setupEventListeners() {
-                // Page input
-                pageInput.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter") {
-                        e.preventDefault();
-                        jumpPage();
-                    }
-                });
-
-                pageInput.addEventListener("blur", jumpPage);
-
-                // Zoom buttons
-                zoomPrev.onclick = () => {
-                    if (zoomPage > 1) {
-                        zoomPage--;
-                        updateZoomImage();
-                    }
-                };
-
-                zoomNext.onclick = () => {
-                    zoomPage++;
-                    updateZoomImage(); 
-                };
-
-                // Global keyboard
-                document.addEventListener("keydown", handleKeyDown);
-
-                // Prevent accidental zoom modal close when clicking image
-                zoomImage.addEventListener("click", (e) => e.stopPropagation());
-
-                // Handle window resize
-                window.addEventListener("resize", () => {
-                    // No action needed, but good to have for future responsive features
-                });
-
-                // Touch events for mobile
-                let touchStartX = 0;
-                let touchEndX = 0;
-                
-                zoomModal.addEventListener("touchstart", (e) => {
-                    touchStartX = e.changedTouches[0].screenX;
-                }, { passive: true });
-                
-                zoomModal.addEventListener("touchend", (e) => {
-                    touchEndX = e.changedTouches[0].screenX;
-                    handleSwipe();
-                }, { passive: true });
-                
-             function handleSwipe() {
-                const swipeThreshold = 50;
-                const diff = touchStartX - touchEndX;
-                
-                if (Math.abs(diff) > swipeThreshold) {
-                    if (diff > 0) {
-                        // Swipe left (finger moves from right to left) → Go to previous page (opposite of right arrow)
-                        if (zoomPage > 1) {
-                            zoomPage--;
-                            updateZoomImage();
-                        }
-                    } else {
-                        // Swipe right (finger moves from left to right) → Go to next page (opposite of left arrow)
-                        zoomPage++;
-                        updateZoomImage(); }
-                    }
-                }
-            }
-
-            // === INITIALIZE APPLICATION ===
-            function init() {
-                initializeSelectors();
-                setupEventListeners();
-                renderPage();
-                
-                // Log for debugging
-                console.log("تطبيق القراءات العشر جاهز للاستخدام");
-            }
-
-            // Start the application when DOM is ready
-            if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", init);
-            } else {
-                init();
-            }
-
-            // Export functions to global scope for inline event handlers
-            window.prevPage = prevPage;
-            window.nextPage = nextPage;
-            window.goToSurah = goToSurah;
-            window.goToJuz = goToJuz;
-            window.openZoom = openZoom;
-            window.outsideClick = outsideClick;
-        })();
-    </script>
+init();
+})();
+</script>
 </body>
 </html>
