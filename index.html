@@ -260,7 +260,10 @@ function render(){
   $("pageNote").value=pnotes[page]||"";
   history.replaceState(null,"","#p="+page);
   const g=$("grid");g.innerHTML="";
-  const L=list();
+  const L=list(),pg=page;
+  let pend=L.length;
+  const done=()=>{if(--pend===0&&pg===page&&!(navigator.connection&&navigator.connection.saveData))
+    (window.requestIdleCallback||setTimeout)(()=>{if(pg===page)preload(pg+1)})};
   if(!L.length){g.innerHTML='<div class="empty">لم تختر أي قراءة. افتح «اختيار القراءات» وحدد قراءة أو أكثر.</div>';return}
   L.forEach((ri,idx)=>{
     const card=document.createElement("div");card.className="card"+(refOn&&idx===0?" ref":"");
@@ -273,8 +276,10 @@ function render(){
     const box=document.createElement("div");box.className="ibox";box.dataset.ri=ri;
     const img=document.createElement("img");img.className="thumb loading";img.loading="lazy";img.draggable=false;
     img.src=src(ri,page);img.alt=`${R[ri][0]} - صفحة ${page}`;
-    img.onload=()=>img.classList.remove("loading");
-    img.onerror=()=>{img.classList.remove("loading");img.classList.add("err");
+    img.decoding="async";
+    const fin=()=>{if(!img._d){img._d=1;done()}};
+    img.onload=()=>{img.classList.remove("loading");fin()};
+    img.onerror=()=>{fin();img.classList.remove("loading");img.classList.add("err");
       img.src="data:image/svg+xml,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='300' height='400'><rect width='300' height='400' fill='#e6e8ec'/><text x='150' y='200' font-family='Arial' font-size='18' fill='#888' text-anchor='middle'>الصورة غير متوفرة</text></svg>")};
     img.onclick=()=>{if(!ann)openZ(idx)};
     box.appendChild(img);
@@ -282,7 +287,6 @@ function render(){
     card.append(t,box,nt);g.appendChild(card);
     attach(box,()=>ri);paint(box,ri);
   });
-  preload(page+1);
 }
 
 /* ---- highlights & notes ---- */
