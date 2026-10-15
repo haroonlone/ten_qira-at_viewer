@@ -339,14 +339,12 @@ function showZ(){
   const ri=list()[zi];if(ri==null)return closeZ();
   $("zoomImage").src=src(ri,page);$("zoomImage").alt=R[ri][0];
   $("zoomTitle").textContent=`${R[ri][0]} — صفحة ${page}`;preloadZ(ri);
-  zoomBy(0);paint($("zbox"),ri);
+  zoomBy(0);$("mwrap").scrollTop=0;paint($("zbox"),ri);
 }
 function zoomBy(d){zz=Math.max(.5,Math.min(3,zz+d));
   const im=$("zoomImage"),zb=$("zbox");
-  if(zz<=1){im.style.maxWidth="calc(100vw - 30px)";im.style.maxHeight="calc(100vh - 110px)";im.style.width="auto";
-    zb.style.transform=zz<1?"scale("+zz+")":"";zb.style.transformOrigin="top center"}
-  else{im.style.maxWidth="none";im.style.maxHeight="none";zb.style.transform="";
-    im.style.width=Math.min(zz*Math.min(innerWidth-30,1000),3000)+"px"}
+  zb.style.transform="";im.style.maxWidth="none";im.style.maxHeight="none";
+  im.style.width=Math.round(zz*Math.min(innerWidth-30,1000))+"px";
 }
 function zPage(d){const p=page+d;if(p<0||p>MAX)return;page=p;render();showZ()}
 function zQ(d){const n=list().length;if(!n)return;zi=(zi+d+n)%n;showZ()}
