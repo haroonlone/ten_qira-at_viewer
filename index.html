@@ -163,7 +163,7 @@ const hp=parseInt((location.hash.match(/p=(\d+)/)||[])[1]);
 if(hp>=0&&hp<=MAX)page=hp;
 
 const imgNum=p=>p===0?1:p+OFF;
-const src=(i,p)=>`${BASE}/${encodeURIComponent(R[i][1])}/page${String(imgNum(p)).padStart(3,"0")}.jpg`;
+const src=(i,p)=>`${BASE}/${encodeURIComponent(R[i][1])}/page${String(imgNum(p)).padStart(3,"0")}.webp`;
 const effCols=()=>{const n=list().length||1;const maxFit=Math.max(1,Math.floor((innerWidth-40)/(innerWidth<600?150:290)));
   return Math.max(1,Math.min(cols||n,n,maxFit>0?maxFit:1))};
 
