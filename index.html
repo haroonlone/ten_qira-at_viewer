@@ -36,7 +36,7 @@ summary{cursor:pointer;padding:8px 14px;font-weight:bold}
 .chip input{width:auto;padding:0;margin:0;accent-color:var(--navy)}
 .chip.sel{border-color:var(--navy);background:var(--navy);color:#fff}
 .grid{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:14px;padding:18px;max-width:1800px;margin:0 auto}
-.card{background:var(--card);padding:6px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,.1);display:flex;flex-direction:column;min-width:0}
+.card{background:var(--card);padding:6px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,.1);display:flex;flex-direction:column;min-width:0;width:100%;max-width:var(--cardmax,none);justify-self:center}
 .title{display:flex;align-items:center;gap:4px;background:var(--navy);color:#fff;border-radius:8px;padding:6px 8px;margin-bottom:6px;font-weight:bold}
 .title .t{flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}
 .ic{cursor:pointer;padding:0 6px;font-size:20px;user-select:none;background:none;border:0;color:#fff;min-width:0;font-weight:bold}
@@ -53,7 +53,7 @@ summary{cursor:pointer;padding:8px 14px;font-weight:bold}
 .track .dot{position:absolute;top:1px;width:6px;height:6px;margin-right:-3px;border-radius:50%;background:#f5b800;pointer-events:none}
 .track .knob{position:absolute;top:50%;width:14px;height:14px;margin:-7px -7px 0 0;border-radius:50%;background:var(--navy);border:2px solid var(--card);box-shadow:0 1px 3px rgba(0,0,0,.3);pointer-events:none}
 .ruling .ibox::after,.ruling .stack::after{content:"";position:absolute;left:0;right:0;top:calc(var(--ry)*100% - 2.6%);height:5.2%;background:rgba(245,184,0,.18);border-block:2px solid rgba(229,72,77,.75);pointer-events:none;border-radius:2px}
-.card.duo{grid-column:1/-1;justify-self:center;width:100%;max-width:820px}
+.card.duo{grid-column:1/-1;justify-self:center;width:100%;max-width:min(820px,var(--cardmax,820px))}
 .card.duo .title{background:#1d6b4f}
 .stack{position:relative;overflow:hidden;border-radius:8px;isolation:isolate}
 .stack img{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;border-radius:8px}
@@ -70,7 +70,8 @@ summary{cursor:pointer;padding:8px 14px;font-weight:bold}
 .mbar{display:flex;gap:8px;align-items:center;width:100%;max-width:1100px;margin-bottom:8px}
 .mbar .mt{flex:1;text-align:center;background:var(--navy);color:#fff;font-weight:bold;padding:7px;border-radius:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mbar button{background:var(--navy);padding:6px 12px;min-width:0;color:#fff;border-color:#4a6a95}
-.mwrap{flex:1;overflow:auto;width:100%;display:flex;justify-content:center;align-items:flex-start;min-height:0}
+.mwrap{flex:1;overflow:auto;width:100%;display:flex;justify-content:flex-start;align-items:flex-start;min-height:0}
+#zbox{margin:0 auto}
 #zoomImage{max-width:none;border-radius:8px;border:3px solid #fff;background:#fff}
 .hint{color:rgba(255,255,255,.7);font-size:13px;margin-top:6px;text-align:center}
 .err{opacity:.6}
@@ -201,6 +202,19 @@ if(hp>=0&&hp<=MAX)page=hp;
 
 const imgNum=p=>p===0?1:p+OFF;
 const src=(i,p)=>`${BASE}/${encodeURIComponent(R[i][1])}/page${String(imgNum(p)).padStart(3,"0")}.webp`;
+/* Size cards so a full page (3:4) fits in the visible height under the sticky bar */
+function fitGrid(){
+  const g=$("grid"),bar=document.querySelector(".bar"),card=g.querySelector(".card");
+  if(!card){g.style.removeProperty("--cardmax");return}
+  const gs=getComputedStyle(g),cs=getComputedStyle(card),t=card.querySelector(".title"),lg=card.querySelector(".legend");
+  const chrome=parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom)
+    +(t?t.offsetHeight+parseFloat(getComputedStyle(t).marginBottom):0)+(lg?lg.offsetHeight:0);
+  const avail=innerHeight-(bar?bar.offsetHeight:0)-parseFloat(gs.paddingTop)-parseFloat(gs.paddingBottom)-chrome-4;
+  const imgH=Math.max(160,avail);
+  g.style.setProperty("--cardmax",Math.floor(imgH*.75+parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight))+"px");
+}
+let rq=0;
+function relayout(){cancelAnimationFrame(rq);rq=requestAnimationFrame(()=>{apply();fitGrid();if(open())zoomBy(0)})}
 const effCols=()=>{const n=list().length||1;const maxFit=Math.max(1,Math.floor((innerWidth-40)/(innerWidth<600?150:290)));
   return Math.max(1,Math.min(cols||n,n,maxFit>0?maxFit:1))};
 
@@ -224,7 +238,10 @@ function init(){
   $("zoomModal").addEventListener("touchend",e=>{const d=sx-e.changedTouches[0].screenX;
     if(zz===1&&Math.abs(d)>60)zPage(d>0?-1:1)},{passive:true});
   document.addEventListener("keydown",keys);
-  addEventListener("resize",apply);
+  addEventListener("resize",relayout);
+  if(window.visualViewport)visualViewport.addEventListener("resize",()=>{if(visualViewport.scale<=1.01)relayout()});
+  if(window.ResizeObserver)new ResizeObserver(()=>fitGrid()).observe(document.querySelector(".bar"));
+  $("zoomImage").onload=()=>zoomBy(0);
   addEventListener("hashchange",()=>{const p=parseInt((location.hash.match(/p=(\d+)/)||[])[1]);
     if(p>=0&&p<=MAX&&p!==page){page=p;render()}});
   R.forEach((r,i)=>["refSel","cmpSel"].forEach(id=>{const o=document.createElement("option");o.value=i;o.textContent=r[0];$(id).appendChild(o)}));
@@ -326,6 +343,7 @@ function render(){
   $("pageNote").value=pnotes[page]||"";
   history.replaceState(null,"","#p="+page);
   const g=$("grid");g.innerHTML="";
+  requestAnimationFrame(fitGrid);
   const L=list();
   drawStrip();
   if(!L.length){g.innerHTML='<div class="empty">لم تختر أي قراءة. افتح «اختيار القراءات» وحدد قراءة أو أكثر.</div>';return}
@@ -439,10 +457,16 @@ function showZ(){
   $("zoomTitle").textContent=`${R[ri][0]} — صفحة ${page}`;preloadZ(ri);
   zoomBy(0);$("mwrap").scrollTop=0;paint($("zbox"),ri);
 }
+function zoomBase(){   /* size that fits the whole page inside the zoom area (width and height) */
+  const im=$("zoomImage"),w=$("mwrap"),aw=w.offsetWidth,ah=w.offsetHeight;
+  if(!aw||!ah)return Math.min(innerWidth-30,1000);
+  const r=im.naturalHeight?im.naturalWidth/im.naturalHeight:.75;
+  return Math.max(120,Math.min(aw,(ah-8)*r+6));
+}
 function zoomBy(d){zz=Math.max(.5,Math.min(3,zz+d));
   const im=$("zoomImage"),zb=$("zbox");
   zb.style.transform="";im.style.maxWidth="none";im.style.maxHeight="none";
-  im.style.width=Math.round(zz*Math.min(innerWidth-30,1000))+"px";
+  im.style.width=Math.floor(zz*zoomBase())+"px";
 }
 function zPage(d){const p=page+d;if(p<0||p>MAX)return;page=p;render();showZ()}
 function zQ(d){const n=list().length;if(!n)return;zi=(zi+d+n)%n;showZ()}
