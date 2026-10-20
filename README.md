@@ -31,6 +31,11 @@ The PDF files were converted into high-resolution images to enable precise side-
 - Juz selection
 - Direct page synchronization between zoom and main comparative view
 
+### 🎚 Visual Comparison Tools
+- Reference mode views: side-by-side, swipe curtain, and adjustable overlay
+- Line ruler that tracks the same line across every displayed Mushaf
+- Position strip showing the current Surah, Juz, and progress through the Mushaf, with markers for annotated pages
+
 ---
 
 ## 🎯 Intended Audience
